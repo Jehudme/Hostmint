@@ -1,0 +1,84 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (auditLog(); as auditLogRef) {
+      <div>
+        <h2 data-cy="auditLogDetailsHeading"><span jhiTranslate="hostMintApp.auditLog.detail.title">Audit Log</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ auditLogRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.action">Action</span></dt>
+          <dd>
+            <span>{{ auditLogRef.action }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.entityName">Entity Name</span></dt>
+          <dd>
+            <span>{{ auditLogRef.entityName }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.entityId">Entity Id</span></dt>
+          <dd>
+            <span>{{ auditLogRef.entityId }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.level">Level</span></dt>
+          <dd>
+            <span [jhiTranslate]="'hostMintApp.LogLevel.' + (auditLogRef.level ?? 'null')">{{
+              { null: '', INFO: 'INFO', WARN: 'WARN', ERROR: 'ERROR', DEBUG: 'DEBUG', TRACE: 'TRACE' }[auditLogRef.level ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.message">Message</span></dt>
+          <dd>
+            <span>{{ auditLogRef.message }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.principal">Principal</span></dt>
+          <dd>
+            <span>{{ auditLogRef.principal }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.correlationId">Correlation Id</span></dt>
+          <dd>
+            <span>{{ auditLogRef.correlationId }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.ipAddress">Ip Address</span></dt>
+          <dd>
+            <span>{{ auditLogRef.ipAddress }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.userAgent">User Agent</span></dt>
+          <dd>
+            <span>{{ auditLogRef.userAgent }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.metadata">Metadata</span></dt>
+          <dd>
+            <span>{{ auditLogRef.metadata }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.createdAt">Created At</span></dt>
+          <dd>
+            <span>{{ auditLogRef.createdAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.actor">Actor</span></dt>
+          <dd>
+            <span>{{ auditLogRef.actor?.login }}</span>
+          </dd>
+          <dt><span jhiTranslate="hostMintApp.auditLog.project">Project</span></dt>
+          <dd>
+            @if (auditLog()!.project) {
+              <div>
+                <a [routerLink]="['/project', auditLog()!.project?.id, 'view']">{{ auditLogRef.project?.projectKey }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span jhiTranslate="entity.action.back">Retour</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

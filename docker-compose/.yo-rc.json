@@ -1,0 +1,13 @@
+{
+  "generator-jhipster": {
+    "appsFolders": [],
+    "clusteredDbApps": [],
+    "deploymentType": "docker-compose",
+    "directoryPath": "../",
+    "dockerRepositoryName": "ghcr.io/jehudme/hostmint",
+    "gatewayType": "SpringCloudGateway",
+    "jwtSecretKey": "NzY0MGI2N2U0NWEwMDc2YTlhOTY5NjU3MjdiOTVjZDhmMjZmOTFhNmFhZGZjZWNiYmUxODY5YmIxNTI5NTkzNTE5NjM3MjNlZTc3NTNlM2E4ZjcyZmM1YzIwMWQ1MDc5YWNhMg==",
+    "monitoring": "no",
+    "serviceDiscoveryType": "consul"
+  }
+}

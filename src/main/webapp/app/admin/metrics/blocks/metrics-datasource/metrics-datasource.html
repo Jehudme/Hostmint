@@ -1,4 +1,4 @@
-<h3 id="datasourceMetrics" jhiTranslate="metrics.datasource.title">DataSource statistics (time in millisecond)</h3>
+<h3 id="datasourceMetrics" jhiTranslate="metrics.datasource.title">Statistiques du pool de connexions (temps en millisecondes)</h3>
 
 @let datasourceMetricsRef = datasourceMetrics();
 @if (!updating() && datasourceMetricsRef) {
@@ -7,12 +7,12 @@
       <thead>
         <tr>
           <th scope="col">
-            <span jhiTranslate="metrics.datasource.usage">Connection Pool Usage</span> (active: {{ datasourceMetricsRef.active.value }},
-            min: {{ datasourceMetricsRef.min.value }}, max: {{ datasourceMetricsRef.max.value }}, idle:
-            {{ datasourceMetricsRef.idle.value }})
+            <span jhiTranslate="metrics.datasource.usage">Usage du Pool de connexion</span> (active:
+            {{ datasourceMetricsRef.active.value }}, min: {{ datasourceMetricsRef.min.value }}, max: {{ datasourceMetricsRef.max.value }},
+            idle: {{ datasourceMetricsRef.idle.value }})
           </th>
-          <th scope="col" class="text-end" jhiTranslate="metrics.datasource.count">Count</th>
-          <th scope="col" class="text-end" jhiTranslate="metrics.datasource.mean">Mean</th>
+          <th scope="col" class="text-end" jhiTranslate="metrics.datasource.count">Total</th>
+          <th scope="col" class="text-end" jhiTranslate="metrics.datasource.mean">Médian</th>
           <th scope="col" class="text-end" jhiTranslate="metrics.servicesstats.table.min">Min</th>
           <th scope="col" class="text-end" jhiTranslate="metrics.servicesstats.table.p50">p50</th>
           <th scope="col" class="text-end" jhiTranslate="metrics.servicesstats.table.p75">p75</th>

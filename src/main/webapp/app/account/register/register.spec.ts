@@ -46,7 +46,7 @@ describe('Register', () => {
     [RegisterService, TranslateService],
     (service: RegisterService, mockTranslateService: TranslateService) => {
       vitest.spyOn(service, 'save').mockReturnValue(of({}));
-      vitest.spyOn(mockTranslateService, 'getCurrentLang').mockReturnValue('en');
+      vitest.spyOn(mockTranslateService, 'getCurrentLang').mockReturnValue('fr');
       comp.registerForm.patchValue({
         password: 'password',
         confirmPassword: 'password',
@@ -58,7 +58,7 @@ describe('Register', () => {
         email: '',
         password: 'password',
         login: '',
-        langKey: 'en',
+        langKey: 'fr',
       });
       expect(comp.success()).toBe(true);
       expect(comp.errorUserExists()).toBe(false);

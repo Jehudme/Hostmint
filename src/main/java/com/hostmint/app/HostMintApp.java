@@ -35,7 +35,7 @@ public class HostMintApp {
     }
 
     /**
-     * Initializes HostMint.
+     * Initializes hostMint.
      * <p>
      * Spring profiles can be configured with a program argument --spring.profiles.active=your-active-profile
      * <p>

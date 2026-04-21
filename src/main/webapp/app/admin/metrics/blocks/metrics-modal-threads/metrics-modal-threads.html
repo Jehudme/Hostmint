@@ -66,8 +66,8 @@
         &nbsp;{{ thread.threadName }} (ID {{ thread.threadId }})
 
         <a (click)="thread.showThreadDump = !thread.showThreadDump" href="javascript:void(0);">
-          <span [hidden]="thread.showThreadDump" jhiTranslate="metrics.jvm.threads.dump.show">Show Stacktrace</span>
-          <span [hidden]="!thread.showThreadDump" jhiTranslate="metrics.jvm.threads.dump.hide">Hide Stacktrace</span>
+          <span [hidden]="thread.showThreadDump" jhiTranslate="metrics.jvm.threads.dump.show">Afficher</span>
+          <span [hidden]="!thread.showThreadDump" jhiTranslate="metrics.jvm.threads.dump.hide">Cacher</span>
         </a>
       </h6>
 
@@ -93,11 +93,11 @@
         </caption>
         <thead>
           <tr>
-            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.blockedtime">Blocked Time</th>
-            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.blockedcount">Blocked Count</th>
-            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.waitedtime">Waited Time</th>
-            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.waitedcount">Waited Count</th>
-            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.lockname">Lock name</th>
+            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.blockedtime">Temps bloqué</th>
+            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.blockedcount">Nb fois bloqué</th>
+            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.waitedtime">Temps d&apos;attente</th>
+            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.waitedcount">Nb fois en attente</th>
+            <th scope="col" jhiTranslate="metrics.jvm.threads.dump.lockname">Nom du processus bloquant</th>
           </tr>
         </thead>
         <tbody>

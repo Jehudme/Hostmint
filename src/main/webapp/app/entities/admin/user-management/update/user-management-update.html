@@ -2,7 +2,7 @@
   <div class="col-8">
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
       <h2 id="myUserLabel" data-cy="UserManagementCreateUpdateHeading" jhiTranslate="userManagement.home.createOrEditLabel">
-        Create or edit a user
+        Créer ou éditer un utilisateur
       </h2>
 
       <jhi-alert-error />
@@ -20,18 +20,18 @@
         @if (loginRef.invalid && (loginRef.dirty || loginRef.touched)) {
           <div>
             @if (loginRef?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
             }
 
             @if (loginRef?.errors?.maxlength) {
               <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                >This field cannot be longer than 50 characters.</small
+                >Ce champ doit faire au maximum 50 caractères.</small
               >
             }
 
             @if (loginRef?.errors?.pattern) {
               <small class="form-text text-danger" jhiTranslate="entity.validation.patternLogin"
-                >This field can only contain letters, digits and e-mail addresses.</small
+                >Ce champ ne peut contenir que des lettres, des chiffres ou des adresses e-mail.</small
               >
             }
           </div>
@@ -39,7 +39,7 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label" for="field_firstName" jhiTranslate="userManagement.firstName">First name</label>
+        <label class="form-label" for="field_firstName" jhiTranslate="userManagement.firstName">Prénom</label>
         <input type="text" id="field_firstName" class="form-control" name="firstName" formControlName="firstName" data-cy="firstName" />
 
         @let firstNameRef = editForm.get('firstName')!;
@@ -47,7 +47,7 @@
           <div>
             @if (firstNameRef?.errors?.maxlength) {
               <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                >This field cannot be longer than 50 characters.</small
+                >Ce champ doit faire au maximum 50 caractères.</small
               >
             }
           </div>
@@ -55,7 +55,7 @@
       </div>
 
       <div class="mb-3">
-        <label class="form-label" for="field_lastName" jhiTranslate="userManagement.lastName">Last name</label>
+        <label class="form-label" for="field_lastName" jhiTranslate="userManagement.lastName">Nom</label>
         <input type="text" id="field_lastName" class="form-control" name="lastName" formControlName="lastName" data-cy="lastName" />
 
         @let lastNameRef = editForm.get('lastName')!;
@@ -63,7 +63,7 @@
           <div>
             @if (lastNameRef?.errors?.maxlength) {
               <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '50' }"
-                >This field cannot be longer than 50 characters.</small
+                >Ce champ doit faire au maximum 50 caractères.</small
               >
             }
           </div>
@@ -78,23 +78,25 @@
         @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
           <div>
             @if (emailRef?.errors?.required) {
-              <small class="form-text text-danger" jhiTranslate="entity.validation.required">This field is required.</small>
+              <small class="form-text text-danger" jhiTranslate="entity.validation.required">Ce champ est obligatoire.</small>
             }
 
             @if (emailRef?.errors?.maxlength) {
               <small class="form-text text-danger" jhiTranslate="entity.validation.maxlength" [translateValues]="{ max: '100' }"
-                >This field cannot be longer than 100 characters.</small
+                >Ce champ doit faire au maximum 100 caractères.</small
               >
             }
 
             @if (emailRef?.errors?.minlength) {
               <small class="form-text text-danger" jhiTranslate="entity.validation.minlength" [translateValues]="{ min: '5' }"
-                >This field is required to be at least 5 characters.</small
+                >Ce champ doit faire au moins 5 caractères.</small
               >
             }
 
             @if (emailRef?.errors?.email) {
-              <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid">Your email is invalid.</small>
+              <small class="form-text text-danger" jhiTranslate="global.messages.validate.email.invalid"
+                >Votre email n&apos;est pas valide.</small
+              >
             }
           </div>
         }
@@ -111,13 +113,13 @@
             formControlName="activated"
             data-cy="activated"
           />
-          <span jhiTranslate="userManagement.activated">Activated</span>
+          <span jhiTranslate="userManagement.activated">Activé</span>
         </label>
       </div>
 
       @if (languages && languages.length > 0) {
         <div class="mb-3">
-          <label class="form-label" for="langKey" jhiTranslate="userManagement.langKey">Language</label>
+          <label class="form-label" for="langKey" jhiTranslate="userManagement.langKey">Langue</label>
           <select class="form-control" id="langKey" name="langKey" formControlName="langKey" data-cy="langKey">
             @for (language of languages; track $index) {
               <option [value]="language">{{ language | findLanguageFromKey }}</option>
@@ -127,7 +129,7 @@
       }
 
       <div class="mb-3">
-        <label class="form-label" for="field_authority" jhiTranslate="userManagement.profiles">Profiles</label>
+        <label class="form-label" for="field_authority" jhiTranslate="userManagement.profiles">Droits</label>
         <select class="form-control" id="field_authority" multiple name="authority" formControlName="authorities">
           @for (authority of authorities(); track $index) {
             <option [value]="authority">{{ authority }}</option>
@@ -135,11 +137,11 @@
         </select>
       </div>
       <button type="button" class="btn btn-secondary" (click)="previousState()" data-cy="entityCreateCancelButton">
-        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+        <fa-icon icon="ban" />&nbsp;<span jhiTranslate="entity.action.cancel">Annuler</span>
       </button>
 
       <button type="submit" [disabled]="editForm.invalid || isSaving()" class="btn btn-primary" data-cy="entityCreateSaveButton">
-        <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+        <fa-icon icon="save" />&nbsp;<span jhiTranslate="entity.action.save">Sauvegarder</span>
       </button>
     </form>
   </div>

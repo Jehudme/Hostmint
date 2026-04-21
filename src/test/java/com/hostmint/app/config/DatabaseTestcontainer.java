@@ -25,7 +25,7 @@ public class DatabaseTestcontainer implements SqlTestContainer, InitializingBean
     public void afterPropertiesSet() {
         if (null == databaseContainer) {
             databaseContainer = new PostgreSQLContainer("postgres:18.3")
-                .withDatabaseName("HostMint")
+                .withDatabaseName("hostMint")
                 .withLogConsumer(new Slf4jLogConsumer(LOG))
                 .withReuse(true);
         }

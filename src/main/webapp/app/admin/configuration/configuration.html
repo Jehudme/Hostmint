@@ -2,7 +2,7 @@
   <div>
     <h2 id="configuration-page-heading" data-cy="configurationPageHeading" jhiTranslate="configuration.title">Configuration</h2>
 
-    <span jhiTranslate="configuration.filter">Filter (by prefix)</span>
+    <span jhiTranslate="configuration.filter">Filtrer (par préfixe)</span>
     <input type="text" [ngModel]="beansFilter()" (ngModelChange)="beansFilter.set($event)" class="form-control" />
 
     <h3 id="spring-configuration">Spring configuration</h3>
@@ -11,9 +11,9 @@
       <thead>
         <tr jhiSort [(sortState)]="sortState">
           <th jhiSortBy="prefix" scope="col" class="w-40">
-            <span jhiTranslate="configuration.table.prefix">Prefix</span> <fa-icon icon="sort" />
+            <span jhiTranslate="configuration.table.prefix">Préfixe</span> <fa-icon icon="sort" />
           </th>
-          <th scope="col" class="w-60"><span jhiTranslate="configuration.table.properties">Properties</span></th>
+          <th scope="col" class="w-60"><span jhiTranslate="configuration.table.properties">Propriétés</span></th>
         </tr>
       </thead>
       <tbody>

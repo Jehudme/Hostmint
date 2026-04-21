@@ -14,7 +14,7 @@ describe('Authority e2e test', () => {
   const authorityPageUrlPattern = new RegExp('/authority(\\?.*)?$');
   let username: string;
   let password: string;
-  const authoritySample = { name: '31fce397-b73a-4893-a93c-d34d243d548e' };
+  const authoritySample = { name: 'adf57b93-a9ba-4b5a-9a3d-18c210f34831' };
 
   let authority;
 
@@ -141,8 +141,8 @@ describe('Authority e2e test', () => {
     });
 
     it('should create an instance of Authority', () => {
-      cy.get(`[data-cy="name"]`).type('b6f665fc-9e5c-4583-8875-25c5f463a84b');
-      cy.get(`[data-cy="name"]`).should('have.value', 'b6f665fc-9e5c-4583-8875-25c5f463a84b');
+      cy.get(`[data-cy="name"]`).type('32d213b7-7f8b-4b12-89ee-f0994d142124');
+      cy.get(`[data-cy="name"]`).should('have.value', '32d213b7-7f8b-4b12-89ee-f0994d142124');
 
       cy.get(entityCreateSaveButtonSelector).click();
 

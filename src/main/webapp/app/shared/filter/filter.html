@@ -1,6 +1,6 @@
 @if (filters().hasAnyFilterSet()) {
   <div class="filter-display">
-    <span jhiTranslate="entity.filters.set">Following filters are set</span>
+    <span jhiTranslate="entity.filters.set">Les filtres suivants sont définis</span>
     <button class="btn" (click)="clearAllFilters()" (keydown.enter)="clearAllFilters()">
       <fa-icon icon="times" title="{{ 'entity.filters.clearAll' | translate }}" />
     </button>

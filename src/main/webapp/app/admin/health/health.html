@@ -1,9 +1,9 @@
 <div>
   <h2>
-    <span id="health-page-heading" data-cy="healthPageHeading" jhiTranslate="health.title">Health Checks</span>
+    <span id="health-page-heading" data-cy="healthPageHeading" jhiTranslate="health.title">Diagnostics</span>
 
     <button class="btn btn-primary float-end" (click)="refresh()">
-      <fa-icon icon="sync" /> <span jhiTranslate="health.refresh.button">Refresh</span>
+      <fa-icon icon="sync" /> <span jhiTranslate="health.refresh.button">Rafraîchir</span>
     </button>
   </h2>
 
@@ -11,9 +11,9 @@
     <table id="healthCheck" class="table table-striped" aria-describedby="health-page-heading">
       <thead>
         <tr>
-          <th scope="col" jhiTranslate="health.table.service">Service name</th>
-          <th scope="col" class="text-center" jhiTranslate="health.table.status">Status</th>
-          <th scope="col" class="text-center" jhiTranslate="health.details.details">Details</th>
+          <th scope="col" jhiTranslate="health.table.service">Nom du service</th>
+          <th scope="col" class="text-center" jhiTranslate="health.table.status">État</th>
+          <th scope="col" class="text-center" jhiTranslate="health.details.details">Détails</th>
         </tr>
       </thead>
       @if (health(); as health) {
@@ -23,14 +23,14 @@
               <td [jhiTranslate]="'health.indicator.' + componentHealth.key">
                 {{
                   {
-                    diskSpace: 'Disk space',
+                    diskSpace: 'Espace disque',
                     ssl: 'SSL',
                     mail: 'Email',
                     livenessState: 'Liveness state',
                     readinessState: 'Readiness state',
                     ping: 'Application',
                     elasticsearch: 'Elasticsearch',
-                    db: 'Database',
+                    db: 'Base de données',
                   }[componentHealth.key] || componentHealth.key
                 }}
               </td>
@@ -41,7 +41,7 @@
                   [jhiTranslate]="'health.status.' + (componentHealth.value?.status ?? 'UNKNOWN')"
                 >
                   {{
-                    { UNKNOWN: 'UNKNOWN', UP: 'UP', OUT_OF_SERVICE: 'OUT_OF_SERVICE', DOWN: 'DOWN' }[
+                    { UNKNOWN: 'INCONNU', UP: 'DISPONIBLE', OUT_OF_SERVICE: 'OUT_OF_SERVICE', DOWN: 'HORS SERVICE' }[
                       componentHealth.value?.status ?? 'UNKNOWN'
                     ]
                   }}

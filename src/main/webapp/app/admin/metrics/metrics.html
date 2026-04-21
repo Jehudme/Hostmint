@@ -1,13 +1,13 @@
 <div>
   <h2>
-    <span id="metrics-page-heading" data-cy="metricsPageHeading" jhiTranslate="metrics.title">Application Metrics</span>
+    <span id="metrics-page-heading" data-cy="metricsPageHeading" jhiTranslate="metrics.title">Métriques de l&apos;application</span>
 
     <button class="btn btn-primary float-end" (click)="refresh()">
-      <fa-icon icon="sync" /> <span jhiTranslate="metrics.refresh.button">Refresh</span>
+      <fa-icon icon="sync" /> <span jhiTranslate="metrics.refresh.button">Rafraîchir</span>
     </button>
   </h2>
 
-  <h3 jhiTranslate="metrics.jvm.title">JVM Metrics</h3>
+  <h3 jhiTranslate="metrics.jvm.title">Métriques de la JVM</h3>
 
   @let metricsRef = metrics();
   @if (metricsRef && !updatingMetrics()) {
@@ -25,7 +25,7 @@
   }
 
   @if (updatingMetrics()) {
-    <div class="well well-lg" jhiTranslate="metrics.updating">Updating...</div>
+    <div class="well well-lg" jhiTranslate="metrics.updating">Mise à jour...</div>
   }
 
   @if (metricsRef?.['http.server.requests']; as metricsRefHttpServerRequests) {

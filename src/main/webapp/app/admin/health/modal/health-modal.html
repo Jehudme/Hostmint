@@ -3,14 +3,14 @@
     <h4 class="modal-title" id="showHealthLabel" [jhiTranslate]="'health.indicator.' + health.key">
       {{
         {
-          diskSpace: 'Disk space',
+          diskSpace: 'Espace disque',
           ssl: 'SSL',
           mail: 'Email',
           livenessState: 'Liveness state',
           readinessState: 'Readiness state',
           ping: 'Application',
           elasticsearch: 'Elasticsearch',
-          db: 'Database',
+          db: 'Base de données',
         }[health.key] || health.key
       }}
     </h4>
@@ -24,14 +24,14 @@
 <div class="modal-body pad">
   @if (health) {
     <div>
-      <h5 jhiTranslate="health.details.properties">Properties</h5>
+      <h5 jhiTranslate="health.details.properties">Propriétés</h5>
 
       <div class="table-responsive">
         <table class="table table-striped" aria-describedby="showHealthLabel">
           <thead>
             <tr>
-              <th scope="col" class="text-start" jhiTranslate="health.details.name">Name</th>
-              <th scope="col" class="text-start" jhiTranslate="health.details.value">Value</th>
+              <th scope="col" class="text-start" jhiTranslate="health.details.name">Nom</th>
+              <th scope="col" class="text-start" jhiTranslate="health.details.value">Valeur</th>
             </tr>
           </thead>
           <tbody>

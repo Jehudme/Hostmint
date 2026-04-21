@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
         <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
-        <span jhiTranslate="hostMintApp.adminAuthority.home.refreshListLabel">Refresh list</span>
+        <span jhiTranslate="hostMintApp.adminAuthority.home.refreshListLabel">Actualiser la liste</span>
       </button>
 
       <button
@@ -15,7 +15,7 @@
         [routerLink]="['/authority/new']"
       >
         <fa-icon icon="plus" />
-        <span jhiTranslate="hostMintApp.adminAuthority.home.createLabel">Create a new Authority</span>
+        <span jhiTranslate="hostMintApp.adminAuthority.home.createLabel">Créer un nouveau Authority</span>
       </button>
     </div>
   </h2>
@@ -26,7 +26,7 @@
 
   @if (authorities().length === 0) {
     <div class="alert alert-warning" id="no-result">
-      <span jhiTranslate="hostMintApp.adminAuthority.home.notFound">No Authorities found</span>
+      <span jhiTranslate="hostMintApp.adminAuthority.home.notFound">Aucun Authority trouvé</span>
     </div>
   } @else {
     <div class="table-responsive table-entities" id="entities">
@@ -53,12 +53,12 @@
                 <div class="btn-group">
                   <a [routerLink]="['/authority', authority.name, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
                     <fa-icon icon="eye" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Voir</span>
                   </a>
 
                   <button type="submit" (click)="delete(authority)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
                     <fa-icon icon="times" />
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Supprimer</span>
                   </button>
                 </div>
               </td>

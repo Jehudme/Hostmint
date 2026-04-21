@@ -57,12 +57,12 @@ describe('Main', () => {
     const defaultPageTitle = 'global.title';
     const parentRoutePageTitle = 'parentTitle';
     const childRoutePageTitle = 'childTitle';
-    const langChangeEvent: LangChangeEvent = { lang: 'en', translations: {} as InterpolatableTranslationObject };
+    const langChangeEvent: LangChangeEvent = { lang: 'fr', translations: {} as InterpolatableTranslationObject };
 
     beforeEach(() => {
       routerState.snapshot.root = { data: {} };
       vitest.spyOn(translateService, 'get').mockImplementation((key: string | string[]) => of(`${key as string} translated`));
-      vitest.spyOn(translateService, 'getCurrentLang').mockReturnValue('en');
+      vitest.spyOn(translateService, 'getCurrentLang').mockReturnValue('fr');
       vitest.spyOn(titleService, 'setTitle');
       comp.ngOnInit();
     });

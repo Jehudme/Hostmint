@@ -15,7 +15,7 @@ import { IUserManagement } from '../user-management.model';
 const userTemplate = {} as IUserManagement;
 
 const newUser: IUserManagement = {
-  langKey: 'en',
+  langKey: 'fr',
   activated: true,
 } as IUserManagement;
 

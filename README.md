@@ -1,4 +1,4 @@
-# HostMint
+# hostMint
 
 This application was generated using JHipster 9.0.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v9.0.0](https://www.jhipster.tech/documentation-archive/v9.0.0).
 
@@ -123,7 +123,7 @@ update src/main/webapp/app/app.config.ts
 
 ### Packaging as jar
 
-To build the final jar and optimize the HostMint application for production, run:
+To build the final jar and optimize the hostMint application for production, run:
 
 ```bash
 ./mvnw -Pprod clean verify

@@ -18,7 +18,7 @@ describe('Settings', () => {
     lastName: 'Doe',
     activated: true,
     email: 'john.doe@mail.com',
-    langKey: 'en',
+    langKey: 'fr',
     login: 'john',
     authorities: [],
     imageUrl: '',
@@ -52,7 +52,7 @@ describe('Settings', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john.doe@mail.com',
-      langKey: 'en',
+      langKey: 'fr',
     };
 
     // WHEN
