@@ -9,14 +9,14 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://hostmint-postgresql:5432/hostMint
       - SPRING_ELASTICSEARCH_URIS=http://hostmint-elasticsearch:9200
-      # La variable de sécurité avec le bon nom (_BASE64_)
       - JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64_SECRET=${JWT_SECRET}
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/management/health']
-      interval: 20s
+      interval: 5s
       timeout: 5s
-      retries: 15
+      retries: 40
     depends_on:
       hostmint-postgresql:
         condition: service_healthy
@@ -33,32 +33,28 @@ services:
       - hostmint_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U hostMint']
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   hostmint-elasticsearch:
-    # Version 8.12.2 pour régler le bug HTTP 400 (indices.exists)
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
     environment:
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
       - discovery.type=single-node
       - xpack.security.enabled=false
     volumes:
       - hostmint_es_data:/usr/share/elasticsearch/data
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health']
-      interval: 20s
+      test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health?wait_for_status=green&timeout=10s']
+      interval: 5s
       timeout: 10s
       retries: 10
-
-  # --- Monitoring Stack ---
 
   prometheus:
     image: prom/prometheus:v3.10.0
     volumes:
       - prometheus_data:/prometheus
-    # Remplacement des "volumes" par "configs" pour éviter l'erreur de dossier
     configs:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
@@ -70,30 +66,28 @@ services:
     image: prom/alertmanager:v0.31.1
     volumes:
       - alertmanager_data:/alertmanager
-    # Injection native du fichier
     configs:
       - source: alertmanager_config
         target: /etc/alertmanager/config.yml
     command:
       - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
 
   grafana:
     image: grafana/grafana:12.4.1
+    volumes:
+      - grafana_data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - grafana_data:/var/lib/grafana
 
-# --- Déclaration des volumes persistants ---
 volumes:
-  hostmint_db_data:
-  hostmint_es_data:
-  prometheus_data:
-  alertmanager_data:
-  grafana_data:
+  prometheus_data: {}
+  grafana_data: {}
+  hostmint_db_data: {}
+  hostmint_es_data: {}
+  alertmanager_data: {}
 
-# --- Définition du contenu des Configs Docker ---
 configs:
   prometheus_config:
     content: |
@@ -104,7 +98,6 @@ configs:
           metrics_path: '/management/prometheus'
           static_configs:
             - targets: ['hostmint:8080']
-
   alertmanager_config:
     content: |
       route:
