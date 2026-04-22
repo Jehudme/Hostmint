@@ -1,6 +1,5 @@
 services:
   hostmint:
-    # On pointe vers l'image générée par ton GitHub Action (tout en minuscules)
     image: ghcr.io/jehudme/hostmint:latest
     environment:
       - _JAVA_OPTIONS=-Xmx512m -Xms256m
@@ -10,6 +9,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
       - SPRING_LIQUIBASE_URL=jdbc:postgresql://hostmint-postgresql:5432/hostMint
       - SPRING_ELASTICSEARCH_URIS=http://hostmint-elasticsearch:9200
+      - JHIPSTER_SECURITY_AUTHENTICATION_JWT_SECRET=${JWT_SECRET}
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/management/health']
@@ -55,8 +55,19 @@ services:
   prometheus:
     image: prom/prometheus:v3.10.0
     volumes:
-      - ./prometheus-conf/:/etc/prometheus/
       - prometheus_data:/prometheus
+      - type: bind
+        source: ./prometheus-conf/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        # Coolify injecte ce contenu dans le fichier avant de lancer le conteneur
+        content: |
+          global:
+            scrape_interval: 10s
+          scrape_configs:
+            - job_name: 'hostmint'
+              metrics_path: '/management/prometheus'
+              static_configs:
+                - targets: ['hostmint:8080']
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -64,8 +75,18 @@ services:
   alertmanager:
     image: prom/alertmanager:v0.31.1
     volumes:
-      - ./alertmanager-conf/:/etc/alertmanager/
       - alertmanager_data:/alertmanager
+      - type: bind
+        source: ./alertmanager-conf/config.yml
+        target: /etc/alertmanager/config.yml
+        content: |
+          route:
+            group_by: ['alertname']
+            receiver: 'web.hook'
+          receivers:
+            - name: 'web.hook'
+              webhook_configs:
+                - url: 'http://127.0.0.1:5001/'
     command:
       - '--config.file=/etc/alertmanager/config.yml'
 
