@@ -13,9 +13,9 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/management/health']
-      interval: 15s
+      interval: 20s
       timeout: 5s
-      retries: 10
+      retries: 15
     depends_on:
       hostmint-postgresql:
         condition: service_healthy
@@ -32,9 +32,9 @@ services:
       - hostmint_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U hostMint']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   hostmint-elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
@@ -46,7 +46,7 @@ services:
       - hostmint_es_data:/usr/share/elasticsearch/data
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health']
-      interval: 10s
+      interval: 20s
       timeout: 10s
       retries: 10
 
@@ -57,7 +57,7 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - type: bind
-        source: prometheus.yml
+        source: ./prometheus.yml # Le './' indique à Docker que c'est un fichier, pas un volume nommé
         target: /etc/prometheus/prometheus.yml
         content: |
           global:
@@ -76,7 +76,7 @@ services:
     volumes:
       - alertmanager_data:/alertmanager
       - type: bind
-        source: config.yml
+        source: ./config.yml # Corrigé ici aussi
         target: /etc/alertmanager/config.yml
         content: |
           route:
@@ -97,6 +97,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
 
+# Seuls les volumes persistants de données sont déclarés ici
 volumes:
   hostmint_db_data:
   hostmint_es_data:
