@@ -49,7 +49,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health?wait_for_status=green&timeout=10s']
+      test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=10s']
       interval: 10s
       timeout: 10s
       retries: 10
