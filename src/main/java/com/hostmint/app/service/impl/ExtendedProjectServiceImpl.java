@@ -1,9 +1,9 @@
 package com.hostmint.app.service.impl;
 
+import com.hostmint.app.aop.audit.Audit;
 import com.hostmint.app.domain.enumeration.LogLevel;
 import com.hostmint.app.repository.ProjectRepository;
 import com.hostmint.app.repository.search.ProjectSearchRepository;
-import com.hostmint.app.service.InternalAuditService;
 import com.hostmint.app.service.dto.ProjectDTO;
 import com.hostmint.app.service.mapper.ProjectMapper;
 import org.springframework.context.annotation.Primary;
@@ -15,38 +15,47 @@ import org.springframework.transaction.annotation.Transactional;
 @Primary
 public class ExtendedProjectServiceImpl extends ProjectServiceImpl {
 
-    private final InternalAuditService internalAuditService;
-
     public ExtendedProjectServiceImpl(
         ProjectRepository projectRepository,
         ProjectMapper projectMapper,
-        ProjectSearchRepository projectSearchRepository,
-        InternalAuditService internalAuditService
+        ProjectSearchRepository projectSearchRepository
     ) {
         super(projectRepository, projectMapper, projectSearchRepository);
-        this.internalAuditService = internalAuditService;
     }
 
     @Override
+    @Audit(
+        action = "PROJECT_CREATED",
+        entity = "#result.name", // Captures real name from the saved object
+        entityId = "#result.id", // Captures the new ID after generation
+        message = "'Successfully created project'",
+        project = "#result" // Passes the saved DTO
+    )
     public ProjectDTO save(ProjectDTO projectDTO) {
-        ProjectDTO result = super.save(projectDTO);
-        internalAuditService.log("PROJECT_CREATED", "Project", LogLevel.INFO, "Created: " + result.getName(), result);
-        return result;
+        return super.save(projectDTO);
     }
 
     @Override
+    @Audit(
+        action = "PROJECT_UPDATED",
+        entity = "#projectDTO.name", // Uses name from the request
+        entityId = "#projectDTO.id",
+        message = "'Updated project details'",
+        project = "#projectDTO"
+    )
     public ProjectDTO update(ProjectDTO projectDTO) {
-        ProjectDTO result = super.update(projectDTO);
-        internalAuditService.log("PROJECT_UPDATED", "Project", LogLevel.INFO, "Updated: " + result.getName(), result);
-        return result;
+        return super.update(projectDTO);
     }
 
     @Override
+    @Audit(
+        action = "PROJECT_DELETED",
+        entity = "'Project'", // Since it's deleted, we use a static string
+        entityId = "#id", // Captures the Long ID passed to the method
+        level = LogLevel.WARN,
+        message = "'Permanently removed project'"
+    )
     public void delete(Long id) {
-        // Fetch project name before it's gone for the log
-        findOne(id).ifPresent(p ->
-            internalAuditService.log("PROJECT_DELETED", "Project", LogLevel.WARN, "Deleted project: " + p.getName(), p)
-        );
         super.delete(id);
     }
 }
