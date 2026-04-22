@@ -97,7 +97,7 @@ relationship ManyToOne {
    --------------------------------------------------------- */
 
 dto * with mapstruct
-service * with serviceClass
+service * with serviceImpl
 paginate * with pagination
 filter *
 search Project, AuditLog, RequestLog with elasticsearch
