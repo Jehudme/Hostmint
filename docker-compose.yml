@@ -57,9 +57,8 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - type: bind
-        source: ./prometheus-conf/prometheus.yml
+        source: prometheus.yml
         target: /etc/prometheus/prometheus.yml
-        # Coolify injecte ce contenu dans le fichier avant de lancer le conteneur
         content: |
           global:
             scrape_interval: 10s
@@ -77,7 +76,7 @@ services:
     volumes:
       - alertmanager_data:/alertmanager
       - type: bind
-        source: ./alertmanager-conf/config.yml
+        source: config.yml
         target: /etc/alertmanager/config.yml
         content: |
           route:
