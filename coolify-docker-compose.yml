@@ -32,7 +32,8 @@ services:
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_DB=hostMint
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      # CHANGEMENT ICI : On monte sur /var/lib/postgresql (requis pour la v18+)
+      - postgresql_data:/var/lib/postgresql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U hostMint']
       interval: 5s
