@@ -17,6 +17,7 @@ application {
     languages [fr, en]
     searchEngine elasticsearch
     testFrameworks [cypress]
+    serviceDiscoveryType no
   }
   entities Project, AuditLog, RequestLog
 }

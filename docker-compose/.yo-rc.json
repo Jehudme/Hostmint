@@ -6,7 +6,7 @@
     "directoryPath": "../",
     "dockerRepositoryName": "ghcr.io/jehudme/hostmint",
     "gatewayType": "SpringCloudGateway",
-    "jwtSecretKey": "NzY0MGI2N2U0NWEwMDc2YTlhOTY5NjU3MjdiOTVjZDhmMjZmOTFhNmFhZGZjZWNiYmUxODY5YmIxNTI5NTkzNTE5NjM3MjNlZTc3NTNlM2E4ZjcyZmM1YzIwMWQ1MDc5YWNhMg==",
+    "jwtSecretKey": "NjJhYzkxZTEyMDMxZTNmYjdmMjZhM2I4MzEyZmNlM2RmNGZkMGU2NzFlNDg0MTI0NDVhMWU4YjAyZWRjNTQ2NmExNDFjNjk2YTc4YmJiZGYyYTczNWE2ZjRhYTk0ZTZmOWNjZQ==",
     "monitoring": "no",
     "serviceDiscoveryType": "consul"
   }

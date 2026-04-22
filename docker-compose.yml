@@ -1,0 +1,85 @@
+services:
+  hostmint:
+    # On pointe vers l'image générée par ton GitHub Action (tout en minuscules)
+    image: ghcr.io/jehudme/hostmint:latest
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://hostmint-postgresql:5432/hostMint
+      - SPRING_DATASOURCE_USERNAME=hostMint
+      - SPRING_DATASOURCE_PASSWORD=${DATABASE_PASSWORD}
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://hostmint-postgresql:5432/hostMint
+      - SPRING_ELASTICSEARCH_URIS=http://hostmint-elasticsearch:9200
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/management/health']
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      hostmint-postgresql:
+        condition: service_healthy
+      hostmint-elasticsearch:
+        condition: service_healthy
+
+  hostmint-postgresql:
+    image: postgres:17.3
+    environment:
+      - POSTGRES_USER=hostMint
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=hostMint
+    volumes:
+      - hostmint_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U hostMint']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  hostmint-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    environment:
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - hostmint_es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health']
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  # --- Monitoring Stack ---
+
+  prometheus:
+    image: prom/prometheus:v3.10.0
+    volumes:
+      - ./prometheus-conf/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+  alertmanager:
+    image: prom/alertmanager:v0.31.1
+    volumes:
+      - ./alertmanager-conf/:/etc/alertmanager/
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+
+  grafana:
+    image: grafana/grafana:12.4.1
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  hostmint_db_data:
+  hostmint_es_data:
+  prometheus_data:
+  alertmanager_data:
+  grafana_data:
