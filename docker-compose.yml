@@ -57,7 +57,7 @@ services:
     volumes:
       - prometheus_data:/prometheus
       - type: bind
-        source: ./prometheus.yml # Le './' indique à Docker que c'est un fichier, pas un volume nommé
+        source: ./prometheus-prod.yml
         target: /etc/prometheus/prometheus.yml
         content: |
           global:
@@ -76,7 +76,7 @@ services:
     volumes:
       - alertmanager_data:/alertmanager
       - type: bind
-        source: ./config.yml # Corrigé ici aussi
+        source: ./alertmanager-prod.yml
         target: /etc/alertmanager/config.yml
         content: |
           route:
@@ -97,7 +97,6 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
 
-# Seuls les volumes persistants de données sont déclarés ici
 volumes:
   hostmint_db_data:
   hostmint_es_data:
