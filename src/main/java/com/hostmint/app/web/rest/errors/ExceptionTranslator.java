@@ -105,6 +105,13 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
     }
 
     protected ProblemDetailWithCause customizeProblem(ProblemDetailWithCause problem, Throwable err, NativeWebRequest request) {
+        HttpServletRequest nativeRequest = request.getNativeRequest(HttpServletRequest.class);
+        if (nativeRequest != null) {
+            // We capture the "detail" which is the user-friendly error message
+            nativeRequest.setAttribute("audit_error_message", problem.getDetail());
+        }
+        // ----------------------
+
         if (problem.getStatus() <= 0) problem.setStatus(toStatus(err));
 
         if (problem.getType() == null || problem.getType().equals(URI.create("about:blank"))) problem.setType(getMappedType(err));
