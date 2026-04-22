@@ -5,27 +5,18 @@ import com.hostmint.app.service.dto.ProjectDTO;
 import java.util.UUID;
 
 /**
- * Service Interface for automating the creation of internal audit logs.
- * This abstracts away the boilerplate of fetching IPs, user agents, and security contexts.
+ * Service Interface for automating AuditLog creation.
  */
 public interface InternalAuditService {
-    /**
-     * Logs an event with minimal required information.
-     */
+    // Basic log
     void log(String action, String entityName, LogLevel level, String message);
 
-    /**
-     * Logs an event linked to a specific entity ID.
-     */
+    // Automated log for Project actions (Matches your call in ExtendedProjectServiceImpl)
+    void log(String action, String entityName, LogLevel level, String message, ProjectDTO project);
+
+    // Log for entities using UUIDs
     void log(String action, String entityName, UUID entityId, LogLevel level, String message);
 
-    /**
-     * Logs an event linked to an entity ID and a Project context.
-     */
-    void log(String action, String entityName, UUID entityId, LogLevel level, String message, ProjectDTO project);
-
-    /**
-     * Logs an event with full business details, including metadata.
-     */
+    // Full signature
     void log(String action, String entityName, UUID entityId, LogLevel level, String message, ProjectDTO project, String metadata);
 }
