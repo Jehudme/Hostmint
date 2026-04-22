@@ -14,9 +14,9 @@ services:
       - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8080/management/health']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 40
+      retries: 20
     depends_on:
       hostmint-postgresql:
         condition: service_healthy
@@ -38,16 +38,16 @@ services:
       retries: 10
 
   hostmint-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3
     environment:
-      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
       - discovery.type=single-node
       - xpack.security.enabled=false
     volumes:
       - hostmint_es_data:/usr/share/elasticsearch/data
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health?wait_for_status=green&timeout=10s']
-      interval: 5s
+      test: ['CMD', 'curl', '-f', 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=10s']
+      interval: 10s
       timeout: 10s
       retries: 10
 
