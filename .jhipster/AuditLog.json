@@ -88,5 +88,5 @@
     }
   ],
   "searchEngine": "elasticsearch",
-  "service": "serviceClass"
+  "service": "serviceImpl"
 }
