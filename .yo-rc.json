@@ -36,7 +36,8 @@
     "testFrameworks": ["cypress"],
     "useSass": true,
     "websocket": "spring-websocket",
-    "withAdminUi": true
+    "withAdminUi": true,
+    "pkType": "uuid"
   },
   "git-company": {
     "0": "J",
