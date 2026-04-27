@@ -102,7 +102,7 @@ class AuditAspectTest {
             action = "PROJECT_CREATE",
             entity = "#result.name",
             entityId = "#result.id",
-            level = LogLevel.INFO,
+            level = "INFO",
             message = "'Created project'",
             project = "#result",
             metadata = "'meta:' + #id"

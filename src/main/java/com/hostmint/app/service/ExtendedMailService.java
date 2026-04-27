@@ -2,7 +2,6 @@ package com.hostmint.app.service;
 
 import com.hostmint.app.aop.audit.Audit;
 import com.hostmint.app.domain.User;
-import com.hostmint.app.domain.enumeration.LogLevel;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
@@ -67,7 +66,7 @@ public class ExtendedMailService extends MailService {
 
     @Override
     @Async
-    @Audit(action = "EMAIL_PASSWORD_RESET_SENT", entity = "#user.login", level = LogLevel.WARN, message = "'To: ' + #user.email")
+    @Audit(action = "EMAIL_PASSWORD_RESET_SENT", entity = "#user.login", level = "WARN", message = "'To: ' + #user.email")
     public void sendPasswordResetMail(User user) {
         sendEmailFromTemplateWithException(user, "mail/passwordResetEmail", "email.reset.title");
     }

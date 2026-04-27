@@ -2,7 +2,6 @@ package com.hostmint.app.service;
 
 import com.hostmint.app.aop.audit.Audit;
 import com.hostmint.app.domain.User;
-import com.hostmint.app.domain.enumeration.LogLevel;
 import com.hostmint.app.repository.AuthorityRepository;
 import com.hostmint.app.repository.UserRepository;
 import com.hostmint.app.repository.search.UserSearchRepository;
@@ -40,7 +39,7 @@ public class ExtendedUserService extends UserService {
     }
 
     @Override
-    @Audit(action = "PASSWORD_CHANGED", entity = "'User'", level = LogLevel.WARN, message = "'User successfully updated their password'")
+    @Audit(action = "PASSWORD_CHANGED", entity = "'User'", level = "WARN", message = "'User successfully updated their password'")
     public void changePassword(String currentClearTextPassword, String newPassword) {
         super.changePassword(currentClearTextPassword, newPassword);
     }
@@ -52,7 +51,7 @@ public class ExtendedUserService extends UserService {
     }
 
     @Override
-    @Audit(action = "USER_DELETED", entity = "#login", level = LogLevel.WARN, message = "'Administrative deletion of user account'")
+    @Audit(action = "USER_DELETED", entity = "#login", level = "WARN", message = "'Administrative deletion of user account'")
     public void deleteUser(String login) {
         super.deleteUser(login);
     }

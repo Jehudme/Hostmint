@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import com.hostmint.app.domain.enumeration.LogLevel;
 import com.hostmint.app.service.AuditLogService;
 import com.hostmint.app.service.dto.AuditLogDTO;
+import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,9 @@ class InternalAuditServiceImplTest {
         InternalAuditServiceImpl service = new InternalAuditServiceImpl(auditLogService);
         UUID entityId = UUID.randomUUID();
 
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("auditor", "n/a"));
+        SecurityContextHolder.getContext().setAuthentication(
+            new UsernamePasswordAuthenticationToken("auditor", "n/a", Collections.emptyList())
+        );
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRemoteAddr("192.168.1.10");

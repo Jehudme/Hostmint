@@ -1,7 +1,6 @@
 package com.hostmint.app.service.impl;
 
 import com.hostmint.app.aop.audit.Audit;
-import com.hostmint.app.domain.enumeration.LogLevel;
 import com.hostmint.app.repository.ProjectRepository;
 import com.hostmint.app.repository.search.ProjectSearchRepository;
 import com.hostmint.app.service.dto.ProjectDTO;
@@ -42,13 +41,7 @@ public class ExtendedProjectServiceImpl extends ProjectServiceImpl {
     }
 
     @Override
-    @Audit(
-        action = "PROJECT_DELETE",
-        entity = "'Project'",
-        entityId = "#id",
-        level = LogLevel.WARN,
-        message = "'Deleted project permanently'"
-    )
+    @Audit(action = "PROJECT_DELETE", entity = "'Project'", entityId = "#id", level = "WARN", message = "'Deleted project permanently'")
     public void delete(UUID id) {
         // Note: ensure this ID type matches your UUID refactor if needed
         super.delete(id);
