@@ -45,7 +45,14 @@ public class AuditAspect {
             UUID entityId = resolveIdAsUuid(auditAnnotation.entityId(), context);
             ProjectDTO project = resolve(auditAnnotation.project(), context, ProjectDTO.class, null);
 
-            auditService.log(action, entityName, entityId, LogLevel.valueOf(auditAnnotation.level()), message, project, metadata);
+            LogLevel resolvedLevel;
+            try {
+                resolvedLevel = LogLevel.valueOf(auditAnnotation.level());
+            } catch (IllegalArgumentException e) {
+                LOG.warn("Unknown audit level '{}' on action '{}', defaulting to INFO", auditAnnotation.level(), auditAnnotation.action());
+                resolvedLevel = LogLevel.INFO;
+            }
+            auditService.log(action, entityName, entityId, resolvedLevel, message, project, metadata);
 
             return result;
         } catch (Throwable e) {

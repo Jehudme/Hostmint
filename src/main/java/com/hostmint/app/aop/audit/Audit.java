@@ -10,6 +10,10 @@ public @interface Audit {
 
     String entity();
 
+    /**
+     * Log level for this audit event. Must be a valid {@link com.hostmint.app.domain.enumeration.LogLevel}
+     * constant name: {@code "INFO"}, {@code "WARN"}, {@code "ERROR"}, {@code "DEBUG"}, or {@code "TRACE"}.
+     */
     String level() default "INFO";
 
     String message() default "";
