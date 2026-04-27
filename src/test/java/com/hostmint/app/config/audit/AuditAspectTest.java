@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.hostmint.app.aop.audit.Audit;
 import com.hostmint.app.domain.enumeration.LogLevel;
 import com.hostmint.app.service.InternalAuditService;
 import com.hostmint.app.service.dto.ProjectDTO;

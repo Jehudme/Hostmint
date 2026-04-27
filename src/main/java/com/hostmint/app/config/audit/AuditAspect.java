@@ -1,5 +1,6 @@
 package com.hostmint.app.config.audit;
 
+import com.hostmint.app.aop.audit.Audit;
 import com.hostmint.app.domain.enumeration.LogLevel;
 import com.hostmint.app.service.InternalAuditService;
 import com.hostmint.app.service.dto.ProjectDTO;

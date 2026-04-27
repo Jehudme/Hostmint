@@ -1,6 +1,6 @@
 package com.hostmint.app.service;
 
-import com.hostmint.app.config.audit.Audit;
+import com.hostmint.app.aop.audit.Audit;
 import com.hostmint.app.domain.User;
 import com.hostmint.app.domain.enumeration.LogLevel;
 import jakarta.mail.MessagingException;

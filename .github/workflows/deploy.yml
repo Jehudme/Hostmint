@@ -45,23 +45,33 @@ jobs:
       - name: Regenerate from JDL (regen gate)
         run: |
           jhipster jdl hostmin.jdl --force
-          DRIFT="$(git status --porcelain)"
-          echo "$DRIFT"
 
-          if [ -n "$DRIFT" ]; then
-            ALLOWED_DRIFT_PATTERN='^ M src/test/java/com/hostmint/app/security/SecurityUtilsUnitTest.java$'
-            UNEXPECTED_DRIFT="$(printf "%s\n" "$DRIFT" | grep -Ev "$ALLOWED_DRIFT_PATTERN|^$" || true)"
-
-            if [ -n "$UNEXPECTED_DRIFT" ]; then
-              echo "::error::Regeneration drift detected after 'jhipster jdl hostmin.jdl --force'."
-              echo "::error::Unexpected changed files:"
-              printf "%s\n" "$UNEXPECTED_DRIFT"
-              echo "::error::Move customizations into non-generated extension files/classes."
-              exit 1
+          # JHipster 9 --force bypasses .jhipsterignore.
+          # Restore every file listed in .jhipsterignore that is tracked by git,
+          # so our intentionally custom files are not replaced by generated ones.
+          while IFS= read -r ignored_file || [ -n "$ignored_file" ]; do
+            # Skip blank lines and comment lines
+            [[ -z "$ignored_file" || "$ignored_file" =~ ^[[:space:]]*# ]] && continue
+            # Only restore if the file is tracked (i.e. committed) and has been modified
+            if git ls-files --error-unmatch "$ignored_file" 2>/dev/null; then
+              git checkout -- "$ignored_file"
+              echo "Restored .jhipsterignore-protected file: $ignored_file"
             fi
+          done < .jhipsterignore
 
-            echo "Only known deterministic regen drift was detected; continuing."
+          # After restoring protected files, any remaining diff means JHipster
+          # overwrote a file we did NOT protect — that is unexpected drift.
+          DRIFT="$(git status --porcelain)"
+          if [ -n "$DRIFT" ]; then
+            echo "::error::Regeneration drift detected after 'jhipster jdl hostmin.jdl --force'."
+            echo "::error::The following generated files differ from the committed state:"
+            printf "%s\n" "$DRIFT"
+            echo "::error::Move your customizations into new non-generated files/classes and"
+            echo "::error::do NOT edit JHipster-owned files directly."
+            exit 1
           fi
+
+          echo "Regen gate passed — no unexpected drift detected."
 
       - name: Build and Push to GHCR
         env:
@@ -69,12 +79,10 @@ jobs:
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/hostmint
           IMAGE_ID=$(echo $IMAGE_ID | tr '[:upper:]' '[:lower:]')
-          
+
           echo "Targeting Registry: $IMAGE_ID"
-          
-          # Added -ntp (no transfer progress) to clean up logs
-          # Added -T 1C to use one thread per core for faster compilation
-          ./mvnw package -Pprod jib:build -ntp -T 1C \
+
+          ./mvnw package -Pprod verify jib:build -ntp -T 1C \
             -Djib.to.image=$IMAGE_ID \
             -Djib.to.auth.username=${{ github.actor }} \
             -Djib.to.auth.password=${{ secrets.GITHUB_TOKEN }}
