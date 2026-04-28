@@ -1,8 +1,11 @@
 package com.hostmint.app.service.impl;
 
 import com.hostmint.app.aop.audit.Audit;
+import com.hostmint.app.domain.enumeration.LogLevel;
 import com.hostmint.app.repository.ProjectRepository;
 import com.hostmint.app.repository.search.ProjectSearchRepository;
+import com.hostmint.app.service.AuditLogService;
+import com.hostmint.app.service.InternalAuditService;
 import com.hostmint.app.service.dto.ProjectDTO;
 import com.hostmint.app.service.mapper.ProjectMapper;
 import java.util.UUID;
@@ -15,36 +18,30 @@ import org.springframework.transaction.annotation.Transactional;
 @Primary
 public class ExtendedProjectServiceImpl extends ProjectServiceImpl {
 
-    // 1. Add this field so we can call flush()
     private final ProjectRepository projectRepository;
+    private final InternalAuditService internalAuditService;
 
     public ExtendedProjectServiceImpl(
         ProjectRepository projectRepository,
         ProjectMapper projectMapper,
-        ProjectSearchRepository projectSearchRepository
+        ProjectSearchRepository projectSearchRepository,
+        InternalAuditService internalAuditService
     ) {
         super(projectRepository, projectMapper, projectSearchRepository);
-        // 2. Assign it
         this.projectRepository = projectRepository;
+        this.internalAuditService = internalAuditService;
     }
 
     @Override
     @Audit(action = "PROJECT_CREATE", entity = "#result.name", entityId = "#result.id", message = "'Created project'", project = "#result")
     public ProjectDTO save(ProjectDTO projectDTO) {
-        // 3. Save it normally (queues the insert)
         ProjectDTO savedResult = super.save(projectDTO);
-
-        // 4. THE MAGIC LINE: Force Hibernate to push the insert to the database NOW
-        projectRepository.flush();
-
         return savedResult;
     }
 
     @Override
-    @Audit(action = "PROJECT_DELETE", entity = "'Project'", entityId = "#id", level = "WARN", message = "'Deleted project permanently'")
+    @Audit(action = "PROJECT_DELETE", entity = "'Project'", entityId = "#id", level = "WARN", message = "'Cannot delete project'")
     public void delete(UUID id) {
-        // Note: ensure this ID type matches your UUID refactor if needed
-        super.delete(id);
-        projectRepository.flush(); // Good practice to flush here too for the same reason
+        // Functionality not available
     }
 }
