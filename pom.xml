@@ -12,7 +12,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.3</version>
+    <version>4.0.4</version>
     <relativePath/>
   </parent>
 
@@ -64,8 +64,7 @@
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-bom</artifactId>
-        <version>24.4.4</version>
-        <type>pom</type>
+        <version>25.1.4</version> <type>pom</type>
         <scope>import</scope>
       </dependency>
     </dependencies>
@@ -75,6 +74,18 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-spring-boot-starter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-dev-server</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.oshi</groupId>
+      <artifactId>oshi-core</artifactId>
+      <version>6.6.1</version>
     </dependency>
 
     <dependency>
@@ -336,14 +347,13 @@
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-maven-plugin</artifactId>
-        <version>24.4.4</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-frontend</goal>
-            </goals>
-          </execution>
-        </executions>
+        <version>25.1.4</version> <executions>
+        <execution>
+          <goals>
+            <goal>prepare-frontend</goal>
+          </goals>
+        </execution>
+      </executions>
       </plugin>
 
       <plugin>

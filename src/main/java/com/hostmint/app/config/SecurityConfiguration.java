@@ -3,9 +3,7 @@ package com.hostmint.app.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.hostmint.app.security.*;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.util.function.Supplier;
+import com.vaadin.flow.spring.security.VaadinSecurityConfigurer; // <--- The modern Vaadin 25 class
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -13,28 +11,26 @@ import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.csrf.*;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
 import tech.jhipster.config.JHipsterConstants;
 import tech.jhipster.config.JHipsterProperties;
 
 @Configuration
+@EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfiguration {
 
     private final Environment env;
-
     private final JHipsterProperties jHipsterProperties;
-
     private final RememberMeServices rememberMeServices;
 
     public SecurityConfiguration(Environment env, RememberMeServices rememberMeServices, JHipsterProperties jHipsterProperties) {
@@ -49,106 +45,98 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) {
-        http
-            .cors(withDefaults())
-            .csrf(csrf ->
-                csrf
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-            )
-            .authorizeHttpRequests(authz ->
-                // prettier-ignore
-                authz
-                    .requestMatchers("/api/authenticate").permitAll()
-                    .requestMatchers("/api/register").permitAll()
-                    .requestMatchers("/api/activate").permitAll()
-                    .requestMatchers("/api/account/reset-password/init").permitAll()
-                    .requestMatchers("/api/account/reset-password/finish").permitAll()
-                    .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    .requestMatchers("/api/**").authenticated()
-                    .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    .requestMatchers("/management/health").permitAll()
-                    .requestMatchers("/management/health/**").permitAll()
-                    .requestMatchers("/management/info").permitAll()
-                    .requestMatchers("/management/prometheus").permitAll()
-                    .requestMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
-            )
-            .rememberMe(rememberMe ->
-                rememberMe
-                    .rememberMeServices(rememberMeServices)
-                    .rememberMeParameter("remember-me")
-                    .key(jHipsterProperties.getSecurity().getRememberMe().getKey())
-            )
-            .exceptionHandling(exceptionHanding -> {
-                AntPathMatcher pathMatcher = new AntPathMatcher();
-                RequestMatcher apiRequestMatcher = request -> pathMatcher.match("/api/**", request.getRequestURI());
-                exceptionHanding.defaultAuthenticationEntryPointFor(
-                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                    new OrRequestMatcher(apiRequestMatcher)
-                );
-            })
-            .formLogin(formLogin ->
-                formLogin
-                    .loginPage("/")
-                    .loginProcessingUrl("/api/authentication")
-                    .successHandler((request, response, authentication) -> response.setStatus(HttpStatus.OK.value()))
-                    .failureHandler((request, response, exception) -> response.setStatus(HttpStatus.UNAUTHORIZED.value()))
-                    .permitAll()
-            )
-            .logout(logout ->
-                logout.logoutUrl("/api/logout").logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler()).permitAll()
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(withDefaults());
+
+        // 1. JHipster API & Management Rules
+        http.authorizeHttpRequests(authz ->
+            authz
+                .requestMatchers("/vaadinServlet/**")
+                .permitAll()
+                .requestMatchers("/VAADIN/**")
+                .permitAll()
+                .requestMatchers("/api/authenticate")
+                .permitAll()
+                .requestMatchers("/api/register")
+                .permitAll()
+                .requestMatchers("/api/activate")
+                .permitAll()
+                .requestMatchers("/api/account/reset-password/init")
+                .permitAll()
+                .requestMatchers("/api/account/reset-password/finish")
+                .permitAll()
+                .requestMatchers("/api/admin/**")
+                .hasAuthority(AuthoritiesConstants.ADMIN)
+                .requestMatchers("/api/**")
+                .authenticated()
+                .requestMatchers("/v3/api-docs/**")
+                .hasAuthority(AuthoritiesConstants.ADMIN)
+                .requestMatchers("/management/health")
+                .permitAll()
+                .requestMatchers("/management/health/**")
+                .permitAll()
+                .requestMatchers("/management/info")
+                .permitAll()
+                .requestMatchers("/management/prometheus")
+                .permitAll()
+                .requestMatchers("/management/**")
+                .hasAuthority(AuthoritiesConstants.ADMIN)
+        );
+
+        // 2. Allow iframes for the Copilot Visual Editor
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+
+        // 3. JHipster Exception Handling and Remember Me
+        http.exceptionHandling(exceptionHandling -> {
+            AntPathMatcher pathMatcher = new AntPathMatcher();
+            RequestMatcher apiRequestMatcher = request -> pathMatcher.match("/api/**", request.getRequestURI());
+            exceptionHandling.defaultAuthenticationEntryPointFor(
+                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                new OrRequestMatcher(apiRequestMatcher)
             );
+        });
+
+        http.rememberMe(rememberMe ->
+            rememberMe
+                .rememberMeServices(rememberMeServices)
+                .rememberMeParameter("remember-me")
+                .key(jHipsterProperties.getSecurity().getRememberMe().getKey())
+        );
+
+        // 4. H2 Console bypass in dev mode
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             http
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
                 .authorizeHttpRequests(authz -> authz.requestMatchers("/h2-console/**").permitAll());
         }
+
+        // ====================================================================
+        // THE OFFICIAL VAADIN 25 SECURITY CONFIGURER
+        // This injects the proper final 'anyRequest()' routing, disables CSRF
+        // exclusively for Vaadin internal endpoints, and provides a default login.
+        // ====================================================================
+        http.with(VaadinSecurityConfigurer.vaadin(), vaadin -> {
+            // Once you create a custom login view with @Route("login"), you can uncomment this:
+            // vaadin.loginView("/login");
+        });
+
         return http.build();
     }
 
-    /**
-     * Custom CSRF handler to provide BREACH protection for Single-Page Applications (SPA).
-     *
-     * @see <a href="https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html#csrf-integration-javascript-spa">Spring Security Documentation - Integrating with CSRF Protection</a>
-     * @see <a href="https://github.com/jhipster/generator-jhipster/pull/25907">JHipster - use customized SpaCsrfTokenRequestHandler to handle CSRF token</a>
-     * @see <a href="https://stackoverflow.com/q/74447118/65681">CSRF protection not working with Spring Security 6</a>
-     */
-    static final class SpaCsrfTokenRequestHandler implements CsrfTokenRequestHandler {
-
-        private final CsrfTokenRequestHandler plain = new CsrfTokenRequestAttributeHandler();
-        private final CsrfTokenRequestHandler xor = new XorCsrfTokenRequestAttributeHandler();
-
-        @Override
-        public void handle(HttpServletRequest request, HttpServletResponse response, Supplier<CsrfToken> csrfToken) {
-            /*
-             * Always use XorCsrfTokenRequestAttributeHandler to provide BREACH protection of
-             * the CsrfToken when it is rendered in the response body.
-             */
-            this.xor.handle(request, response, csrfToken);
-
-            // Render the token value to a cookie by causing the deferred token to be loaded.
-            csrfToken.get();
-        }
-
-        @Override
-        public String resolveCsrfTokenValue(HttpServletRequest request, CsrfToken csrfToken) {
-            /*
-             * If the request contains a request header, use CsrfTokenRequestAttributeHandler
-             * to resolve the CsrfToken. This applies when a single-page application includes
-             * the header value automatically, which was obtained via a cookie containing the
-             * raw CsrfToken.
-             */
-            if (StringUtils.hasText(request.getHeader(csrfToken.getHeaderName()))) {
-                return this.plain.resolveCsrfTokenValue(request, csrfToken);
-            }
-            /*
-             * In all other cases (e.g. if the request contains a request parameter), use
-             * XorCsrfTokenRequestAttributeHandler to resolve the CsrfToken. This applies
-             * when a server-side rendered form includes the _csrf request parameter as a
-             * hidden input.
-             */
-            return this.xor.resolveCsrfTokenValue(request, csrfToken);
-        }
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web ->
+            web
+                .ignoring()
+                .requestMatchers(
+                    "/VAADIN/**",
+                    "/favicon.ico",
+                    "/robots.txt",
+                    "/manifest.webmanifest",
+                    "/sw.js",
+                    "/offline.html",
+                    "/line-awesome/**",
+                    "/frontend/**"
+                );
     }
 }
