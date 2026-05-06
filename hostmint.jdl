@@ -1,38 +1,26 @@
-/**
- * HostMint Application Configuration
- * Package: com.hostmint.app
- */
+
 application {
   config {
-    baseName hostMint
+    baseName HostMint
     applicationType monolith
     packageName com.hostmint.app
-    authenticationType jwt
+    authenticationType session
     buildTool maven
-    clientFramework angular
+    clientFramework vaadin
     databaseType sql
     devDatabaseType h2Disk
     prodDatabaseType postgresql
     enableTranslation true
-    nativeLanguage fr
+    nativeLanguage en
     languages [fr, en]
     searchEngine elasticsearch
     testFrameworks [cypress]
-    serviceDiscoveryType no
-    // Note: pkType must be set in .yo-rc.json, not here in JDL config for v9
   }
   entities Project, AuditLog, RequestLog
 }
 
 /* ---------------------------------------------------------
-   GLOBAL DIRECTIVES
-   --------------------------------------------------------- */
-
-// Use UUID for all primary keys
-use UUID for *
-
-/* ---------------------------------------------------------
-   ENTITIES
+   ENTITIES (Defaulting to Long IDs)
    --------------------------------------------------------- */
 
 entity Project {
@@ -46,7 +34,7 @@ entity Project {
 entity AuditLog {
   action String required maxlength(120)
   entityName String required maxlength(120)
-  entityId UUID
+  entityId Long // Changed to Long to match
   level LogLevel required
   message String required maxlength(1000)
   principal String maxlength(255)
@@ -79,10 +67,6 @@ enum HttpMethod {
   GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
 }
 
-/* ---------------------------------------------------------
-   RELATIONSHIPS
-   --------------------------------------------------------- */
-
 relationship ManyToOne {
   Project{owner(login) required} to User with builtInEntity
   AuditLog{actor(login)} to User with builtInEntity
@@ -91,13 +75,8 @@ relationship ManyToOne {
   RequestLog{project(projectKey)} to Project
 }
 
-/* ---------------------------------------------------------
-   OPTIONS
-   --------------------------------------------------------- */
-
 dto * with mapstruct
 service * with serviceImpl
-// FIX: Using 'paginate' keyword instead of 'pagination' to satisfy the parser
 paginate * with pagination
 filter *
 search Project, AuditLog, RequestLog with elasticsearch
