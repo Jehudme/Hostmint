@@ -2,6 +2,14 @@ package com.hostmint.app;
 
 import com.hostmint.app.config.ApplicationProperties;
 import com.hostmint.app.config.CRLFLogConverter;
+// --- VAADIN IMPORTS ---
+import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.component.page.ColorScheme;
+import com.vaadin.flow.component.page.Push;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
+// ----------------------
+
 import jakarta.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -24,7 +32,12 @@ import tech.jhipster.config.JHipsterConstants;
 @SpringBootApplication(exclude = { H2ConsoleAutoConfiguration.class })
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
 @EnableElasticsearchRepositories("com.hostmint.app.repository.search")
-public class HostMintApp {
+// --- VAADIN SHELL CONFIGURATION ---
+@Theme(themeClass = Lumo.class)
+@ColorScheme(ColorScheme.Value.DARK)
+@Push
+// ----------------------------------
+public class HostMintApp implements AppShellConfigurator {
 
     private static final Logger LOG = LoggerFactory.getLogger(HostMintApp.class);
 

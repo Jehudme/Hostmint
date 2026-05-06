@@ -3,7 +3,7 @@ package com.hostmint.app.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.hostmint.app.security.*;
-import com.vaadin.flow.spring.security.VaadinSecurityConfigurer; // <--- The modern Vaadin 25 class
+import com.vaadin.flow.spring.security.VaadinSecurityConfigurer; // Official Vaadin 25 Security
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -48,13 +47,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(withDefaults());
 
-        // 1. JHipster API & Management Rules
+        // 1. JHipster API Rules
         http.authorizeHttpRequests(authz ->
             authz
-                .requestMatchers("/vaadinServlet/**")
-                .permitAll()
-                .requestMatchers("/VAADIN/**")
-                .permitAll()
                 .requestMatchers("/api/authenticate")
                 .permitAll()
                 .requestMatchers("/api/register")
@@ -83,10 +78,10 @@ public class SecurityConfiguration {
                 .hasAuthority(AuthoritiesConstants.ADMIN)
         );
 
-        // 2. Allow iframes for the Copilot Visual Editor
+        // 2. Allow iframes for Vaadin Copilot
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
-        // 3. JHipster Exception Handling and Remember Me
+        // 3. JHipster API Exception Handling
         http.exceptionHandling(exceptionHandling -> {
             AntPathMatcher pathMatcher = new AntPathMatcher();
             RequestMatcher apiRequestMatcher = request -> pathMatcher.match("/api/**", request.getRequestURI());
@@ -103,40 +98,16 @@ public class SecurityConfiguration {
                 .key(jHipsterProperties.getSecurity().getRememberMe().getKey())
         );
 
-        // 4. H2 Console bypass in dev mode
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             http
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
                 .authorizeHttpRequests(authz -> authz.requestMatchers("/h2-console/**").permitAll());
         }
 
-        // ====================================================================
-        // THE OFFICIAL VAADIN 25 SECURITY CONFIGURER
-        // This injects the proper final 'anyRequest()' routing, disables CSRF
-        // exclusively for Vaadin internal endpoints, and provides a default login.
-        // ====================================================================
-        http.with(VaadinSecurityConfigurer.vaadin(), vaadin -> {
-            // Once you create a custom login view with @Route("login"), you can uncomment this:
-            // vaadin.loginView("/login");
-        });
+        // 4. THE OFFICIAL VAADIN INTEGRATION
+        // This automatically permits static CSS/JS, fixes the 401s, and handles the catch-all routing.
+        http.with(VaadinSecurityConfigurer.vaadin(), vaadin -> {});
 
         return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web ->
-            web
-                .ignoring()
-                .requestMatchers(
-                    "/VAADIN/**",
-                    "/favicon.ico",
-                    "/robots.txt",
-                    "/manifest.webmanifest",
-                    "/sw.js",
-                    "/offline.html",
-                    "/line-awesome/**",
-                    "/frontend/**"
-                );
     }
 }
