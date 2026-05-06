@@ -6,7 +6,7 @@ application {
     packageName com.hostmint.app
     authenticationType session
     buildTool maven
-    clientFramework vaadin
+    skipClient true
     databaseType sql
     devDatabaseType h2Disk
     prodDatabaseType postgresql
