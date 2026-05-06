@@ -1,0 +1,39 @@
+# This configuration is intended for development purpose, it's **your** responsibility to harden it for production
+name: hostmint
+services:
+  app:
+    image: hostmint
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,api-docs
+      - MANAGEMENT_PROMETHEUS_METRICS_EXPORT_ENABLED=true
+      - SPRING_SECURITY_REMEMBER_ME_KEY=5aed3f94077f847de34d9350fbbc2730f4054f455fd75662f33d73939ee4caf0c3438f7b1db98f45c48168f97bc9d7312763
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/HostMint
+      - SPRING_DATASOURCE_USERNAME=HostMint
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_LIQUIBASE_URL=jdbc:postgresql://postgresql:5432/HostMint
+      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+    ports:
+      - 127.0.0.1:8080:8080
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8080/management/health
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+  postgresql:
+    extends:
+      file: ./postgresql.yml
+      service: postgresql
+  elasticsearch:
+    extends:
+      file: ./elasticsearch.yml
+      service: elasticsearch

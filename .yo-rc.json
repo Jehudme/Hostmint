@@ -1,0 +1,22 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "session",
+    "baseName": "HostMint",
+    "buildTool": "maven",
+    "databaseType": "sql",
+    "devDatabaseType": "h2Disk",
+    "enableTranslation": true,
+    "entities": ["Project", "AuditLog", "RequestLog"],
+    "jhipsterVersion": "9.0.0",
+    "languages": ["en", "fr"],
+    "lastLiquibaseTimestamp": 1778096353000,
+    "nativeLanguage": "en",
+    "packageName": "com.hostmint.app",
+    "prodDatabaseType": "postgresql",
+    "rememberMeKey": "5aed3f94077f847de34d9350fbbc2730f4054f455fd75662f33d73939ee4caf0c3438f7b1db98f45c48168f97bc9d7312763",
+    "searchEngine": "elasticsearch",
+    "skipClient": true,
+    "testFrameworks": ["cypress"]
+  }
+}
