@@ -73,13 +73,21 @@
   <dependencies>
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-spring-boot-starter</artifactId>
+      <!-- Replace artifactId with vaadin-core to use only free components -->
+      <artifactId>vaadin</artifactId>
     </dependency>
-
     <dependency>
       <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-dev-server</artifactId>
+      <artifactId>vaadin-dev</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>hilla-spring-boot-starter</artifactId>
     </dependency>
 
     <dependency>
@@ -347,13 +355,14 @@
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-maven-plugin</artifactId>
-        <version>25.1.4</version> <executions>
-        <execution>
-          <goals>
-            <goal>prepare-frontend</goal>
-          </goals>
-        </execution>
-      </executions>
+        <version>25.1.4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build-frontend</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>

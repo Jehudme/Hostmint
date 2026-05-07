@@ -105,7 +105,6 @@ public class SecurityConfiguration {
         }
 
         // 4. THE OFFICIAL VAADIN INTEGRATION
-        // This automatically permits static CSS/JS, fixes the 401s, and handles the catch-all routing.
         http.with(VaadinSecurityConfigurer.vaadin(), vaadin -> {});
 
         return http.build();
