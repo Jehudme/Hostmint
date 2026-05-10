@@ -44,5 +44,5 @@
     }
   ],
   "searchEngine": "elasticsearch",
-  "service": "serviceImpl"
+  "service": "serviceClass"
 }
