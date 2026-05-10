@@ -6,7 +6,6 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A DTO for the {@link com.hostmint.app.domain.AuditLog} entity.
@@ -14,7 +13,7 @@ import java.util.UUID;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class AuditLogDTO implements Serializable {
 
-    private UUID id;
+    private Long id;
 
     @NotNull
     @Size(max = 120)
@@ -24,7 +23,7 @@ public class AuditLogDTO implements Serializable {
     @Size(max = 120)
     private String entityName;
 
-    private UUID entityId;
+    private Long entityId;
 
     @NotNull
     private LogLevel level;
@@ -55,11 +54,11 @@ public class AuditLogDTO implements Serializable {
 
     private ProjectDTO project;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -79,11 +78,11 @@ public class AuditLogDTO implements Serializable {
         this.entityName = entityName;
     }
 
-    public UUID getEntityId() {
+    public Long getEntityId() {
         return entityId;
     }
 
-    public void setEntityId(UUID entityId) {
+    public void setEntityId(Long entityId) {
         this.entityId = entityId;
     }
 
@@ -192,10 +191,10 @@ public class AuditLogDTO implements Serializable {
     @Override
     public String toString() {
         return "AuditLogDTO{" +
-            "id='" + getId() + "'" +
+            "id=" + getId() +
             ", action='" + getAction() + "'" +
             ", entityName='" + getEntityName() + "'" +
-            ", entityId='" + getEntityId() + "'" +
+            ", entityId=" + getEntityId() +
             ", level='" + getLevel() + "'" +
             ", message='" + getMessage() + "'" +
             ", principal='" + getPrincipal() + "'" +

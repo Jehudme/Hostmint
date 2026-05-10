@@ -2,27 +2,17 @@ package com.hostmint.app.security;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.ClaimAccessor;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
  * Utility class for Spring Security.
  */
 public final class SecurityUtils {
-
-    public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
-
-    public static final String AUTHORITIES_CLAIM = "auth";
-
-    public static final String USER_ID_CLAIM = "userId";
 
     private SecurityUtils() {}
 
@@ -41,37 +31,10 @@ public final class SecurityUtils {
             return null;
         } else if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
             return springSecurityUser.getUsername();
-        } else if (authentication.getPrincipal() instanceof Jwt jwt) {
-            return jwt.getSubject();
         } else if (authentication.getPrincipal() instanceof String s) {
             return s;
         }
         return null;
-    }
-
-    /**
-     * Get the JWT of the current user.
-     *
-     * @return the JWT of the current user.
-     */
-    public static Optional<String> getCurrentUserJWT() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional.ofNullable(securityContext.getAuthentication())
-            .filter(authentication -> authentication.getCredentials() instanceof String)
-            .map(authentication -> (String) authentication.getCredentials());
-    }
-
-    /**
-     * Get the Id of the current user.
-     *
-     * @return the Id of the current user.
-     */
-    public static Optional<UUID> getCurrentUserId() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        return Optional.ofNullable(securityContext.getAuthentication())
-            .filter(authentication -> authentication.getPrincipal() instanceof ClaimAccessor)
-            .map(authentication -> (ClaimAccessor) authentication.getPrincipal())
-            .map(principal -> principal.getClaim(USER_ID_CLAIM));
     }
 
     /**

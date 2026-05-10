@@ -3,7 +3,6 @@ package com.hostmint.app.repository;
 import com.hostmint.app.domain.Project;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -14,11 +13,11 @@ import org.springframework.stereotype.Repository;
  * Spring Data JPA repository for the Project entity.
  */
 @Repository
-public interface ProjectRepository extends JpaRepository<Project, UUID>, JpaSpecificationExecutor<Project> {
+public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpecificationExecutor<Project> {
     @Query("select project from Project project where project.owner.login = ?#{authentication.name}")
     List<Project> findByOwnerIsCurrentUser();
 
-    default Optional<Project> findOneWithEagerRelationships(UUID id) {
+    default Optional<Project> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }
 
@@ -40,5 +39,5 @@ public interface ProjectRepository extends JpaRepository<Project, UUID>, JpaSpec
     List<Project> findAllWithToOneRelationships();
 
     @Query("select project from Project project left join fetch project.owner where project.id =:id")
-    Optional<Project> findOneWithToOneRelationships(@Param("id") UUID id);
+    Optional<Project> findOneWithToOneRelationships(@Param("id") Long id);
 }

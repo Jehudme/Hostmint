@@ -4,6 +4,7 @@ import com.hostmint.app.config.Constants;
 import com.hostmint.app.domain.Authority;
 import com.hostmint.app.domain.User;
 import com.hostmint.app.repository.AuthorityRepository;
+import com.hostmint.app.repository.PersistentTokenRepository;
 import com.hostmint.app.repository.UserRepository;
 import com.hostmint.app.repository.search.UserSearchRepository;
 import com.hostmint.app.security.AuthoritiesConstants;
@@ -11,6 +12,7 @@ import com.hostmint.app.security.SecurityUtils;
 import com.hostmint.app.service.dto.AdminUserDTO;
 import com.hostmint.app.service.dto.UserDTO;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -40,6 +42,8 @@ public class UserService {
 
     private final UserSearchRepository userSearchRepository;
 
+    private final PersistentTokenRepository persistentTokenRepository;
+
     private final AuthorityRepository authorityRepository;
 
     private final CacheManager cacheManager;
@@ -48,12 +52,14 @@ public class UserService {
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         UserSearchRepository userSearchRepository,
+        PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userSearchRepository = userSearchRepository;
+        this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
     }
@@ -299,6 +305,25 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
         return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
+    }
+
+    /**
+     * Persistent Token are used for providing automatic authentication, they should be automatically deleted after
+     * 30 days.
+     * <p>
+     * This is scheduled to get fired every day, at midnight.
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void removeOldPersistentTokens() {
+        LocalDate now = LocalDate.now();
+        persistentTokenRepository
+            .findByTokenDateBefore(now.minusMonths(1))
+            .forEach(token -> {
+                LOG.debug("Deleting token {}", token.getSeries());
+                User user = token.getUser();
+                user.getPersistentTokens().remove(token);
+                persistentTokenRepository.delete(token);
+            });
     }
 
     /**

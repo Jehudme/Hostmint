@@ -4,7 +4,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.hostmint.app.domain.Project;
 import com.hostmint.app.repository.ProjectRepository;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 /**
  * Spring Data Elasticsearch repository for the {@link Project} entity.
  */
-public interface ProjectSearchRepository extends ElasticsearchRepository<Project, UUID>, ProjectSearchRepositoryInternal {}
+public interface ProjectSearchRepository extends ElasticsearchRepository<Project, Long>, ProjectSearchRepositoryInternal {}
 
 interface ProjectSearchRepositoryInternal {
     Page<Project> search(String query, Pageable pageable);
@@ -30,7 +29,7 @@ interface ProjectSearchRepositoryInternal {
     void index(Project entity);
 
     @Async
-    void deleteFromIndexById(UUID id);
+    void deleteFromIndexById(Long id);
 }
 
 class ProjectSearchRepositoryInternalImpl implements ProjectSearchRepositoryInternal {
@@ -62,7 +61,7 @@ class ProjectSearchRepositoryInternalImpl implements ProjectSearchRepositoryInte
     }
 
     @Override
-    public void deleteFromIndexById(UUID id) {
+    public void deleteFromIndexById(Long id) {
         elasticsearchTemplate.delete(String.valueOf(id), Project.class);
     }
 }

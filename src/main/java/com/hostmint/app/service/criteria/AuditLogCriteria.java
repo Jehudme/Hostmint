@@ -42,13 +42,13 @@ public class AuditLogCriteria implements Serializable, Criteria {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private UUIDFilter id;
+    private LongFilter id;
 
     private StringFilter action;
 
     private StringFilter entityName;
 
-    private UUIDFilter entityId;
+    private LongFilter entityId;
 
     private LogLevelFilter level;
 
@@ -64,19 +64,19 @@ public class AuditLogCriteria implements Serializable, Criteria {
 
     private InstantFilter createdAt;
 
-    private UUIDFilter actorId;
+    private LongFilter actorId;
 
-    private UUIDFilter projectId;
+    private LongFilter projectId;
 
     private Boolean distinct;
 
     public AuditLogCriteria() {}
 
     public AuditLogCriteria(AuditLogCriteria other) {
-        this.id = other.optionalId().map(UUIDFilter::copy).orElse(null);
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.action = other.optionalAction().map(StringFilter::copy).orElse(null);
         this.entityName = other.optionalEntityName().map(StringFilter::copy).orElse(null);
-        this.entityId = other.optionalEntityId().map(UUIDFilter::copy).orElse(null);
+        this.entityId = other.optionalEntityId().map(LongFilter::copy).orElse(null);
         this.level = other.optionalLevel().map(LogLevelFilter::copy).orElse(null);
         this.message = other.optionalMessage().map(StringFilter::copy).orElse(null);
         this.principal = other.optionalPrincipal().map(StringFilter::copy).orElse(null);
@@ -84,8 +84,8 @@ public class AuditLogCriteria implements Serializable, Criteria {
         this.ipAddress = other.optionalIpAddress().map(StringFilter::copy).orElse(null);
         this.userAgent = other.optionalUserAgent().map(StringFilter::copy).orElse(null);
         this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
-        this.actorId = other.optionalActorId().map(UUIDFilter::copy).orElse(null);
-        this.projectId = other.optionalProjectId().map(UUIDFilter::copy).orElse(null);
+        this.actorId = other.optionalActorId().map(LongFilter::copy).orElse(null);
+        this.projectId = other.optionalProjectId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -94,22 +94,22 @@ public class AuditLogCriteria implements Serializable, Criteria {
         return new AuditLogCriteria(this);
     }
 
-    public UUIDFilter getId() {
+    public LongFilter getId() {
         return id;
     }
 
-    public Optional<UUIDFilter> optionalId() {
+    public Optional<LongFilter> optionalId() {
         return Optional.ofNullable(id);
     }
 
-    public UUIDFilter id() {
+    public LongFilter id() {
         if (id == null) {
-            setId(new UUIDFilter());
+            setId(new LongFilter());
         }
         return id;
     }
 
-    public void setId(UUIDFilter id) {
+    public void setId(LongFilter id) {
         this.id = id;
     }
 
@@ -151,22 +151,22 @@ public class AuditLogCriteria implements Serializable, Criteria {
         this.entityName = entityName;
     }
 
-    public UUIDFilter getEntityId() {
+    public LongFilter getEntityId() {
         return entityId;
     }
 
-    public Optional<UUIDFilter> optionalEntityId() {
+    public Optional<LongFilter> optionalEntityId() {
         return Optional.ofNullable(entityId);
     }
 
-    public UUIDFilter entityId() {
+    public LongFilter entityId() {
         if (entityId == null) {
-            setEntityId(new UUIDFilter());
+            setEntityId(new LongFilter());
         }
         return entityId;
     }
 
-    public void setEntityId(UUIDFilter entityId) {
+    public void setEntityId(LongFilter entityId) {
         this.entityId = entityId;
     }
 
@@ -303,41 +303,41 @@ public class AuditLogCriteria implements Serializable, Criteria {
         this.createdAt = createdAt;
     }
 
-    public UUIDFilter getActorId() {
+    public LongFilter getActorId() {
         return actorId;
     }
 
-    public Optional<UUIDFilter> optionalActorId() {
+    public Optional<LongFilter> optionalActorId() {
         return Optional.ofNullable(actorId);
     }
 
-    public UUIDFilter actorId() {
+    public LongFilter actorId() {
         if (actorId == null) {
-            setActorId(new UUIDFilter());
+            setActorId(new LongFilter());
         }
         return actorId;
     }
 
-    public void setActorId(UUIDFilter actorId) {
+    public void setActorId(LongFilter actorId) {
         this.actorId = actorId;
     }
 
-    public UUIDFilter getProjectId() {
+    public LongFilter getProjectId() {
         return projectId;
     }
 
-    public Optional<UUIDFilter> optionalProjectId() {
+    public Optional<LongFilter> optionalProjectId() {
         return Optional.ofNullable(projectId);
     }
 
-    public UUIDFilter projectId() {
+    public LongFilter projectId() {
         if (projectId == null) {
-            setProjectId(new UUIDFilter());
+            setProjectId(new LongFilter());
         }
         return projectId;
     }
 
-    public void setProjectId(UUIDFilter projectId) {
+    public void setProjectId(LongFilter projectId) {
         this.projectId = projectId;
     }
 

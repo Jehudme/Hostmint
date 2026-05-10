@@ -4,7 +4,6 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A DTO for the {@link com.hostmint.app.domain.Project} entity.
@@ -12,7 +11,7 @@ import java.util.UUID;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ProjectDTO implements Serializable {
 
-    private UUID id;
+    private Long id;
 
     @NotNull
     @Size(min = 2, max = 140)
@@ -30,11 +29,11 @@ public class ProjectDTO implements Serializable {
     @NotNull
     private UserDTO owner;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -103,7 +102,7 @@ public class ProjectDTO implements Serializable {
     @Override
     public String toString() {
         return "ProjectDTO{" +
-            "id='" + getId() + "'" +
+            "id=" + getId() +
             ", name='" + getName() + "'" +
             ", projectKey='" + getProjectKey() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +

@@ -22,7 +22,6 @@ import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,8 +52,9 @@ class AuditLogResourceIT {
     private static final String DEFAULT_ENTITY_NAME = "AAAAAAAAAA";
     private static final String UPDATED_ENTITY_NAME = "BBBBBBBBBB";
 
-    private static final UUID DEFAULT_ENTITY_ID = UUID.randomUUID();
-    private static final UUID UPDATED_ENTITY_ID = UUID.randomUUID();
+    private static final Long DEFAULT_ENTITY_ID = 1L;
+    private static final Long UPDATED_ENTITY_ID = 2L;
+    private static final Long SMALLER_ENTITY_ID = 1L - 1L;
 
     private static final LogLevel DEFAULT_LEVEL = LogLevel.INFO;
     private static final LogLevel UPDATED_LEVEL = LogLevel.WARN;
@@ -182,10 +182,10 @@ class AuditLogResourceIT {
             .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(auditLog.getId().toString())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(auditLog.getId().intValue())))
             .andExpect(jsonPath("$.[*].action").value(hasItem(DEFAULT_ACTION)))
             .andExpect(jsonPath("$.[*].entityName").value(hasItem(DEFAULT_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY_ID.toString())))
+            .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY_ID.intValue())))
             .andExpect(jsonPath("$.[*].level").value(hasItem(DEFAULT_LEVEL.toString())))
             .andExpect(jsonPath("$.[*].message").value(hasItem(DEFAULT_MESSAGE)))
             .andExpect(jsonPath("$.[*].principal").value(hasItem(DEFAULT_PRINCIPAL)))
@@ -224,10 +224,10 @@ class AuditLogResourceIT {
             .perform(get(ENTITY_API_URL_ID, auditLog.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(auditLog.getId().toString()))
+            .andExpect(jsonPath("$.id").value(auditLog.getId().intValue()))
             .andExpect(jsonPath("$.action").value(DEFAULT_ACTION))
             .andExpect(jsonPath("$.entityName").value(DEFAULT_ENTITY_NAME))
-            .andExpect(jsonPath("$.entityId").value(DEFAULT_ENTITY_ID.toString()))
+            .andExpect(jsonPath("$.entityId").value(DEFAULT_ENTITY_ID.intValue()))
             .andExpect(jsonPath("$.level").value(DEFAULT_LEVEL.toString()))
             .andExpect(jsonPath("$.message").value(DEFAULT_MESSAGE))
             .andExpect(jsonPath("$.principal").value(DEFAULT_PRINCIPAL))
@@ -244,9 +244,13 @@ class AuditLogResourceIT {
         // Initialize the database
         insertedAuditLog = auditLogRepository.saveAndFlush(auditLog);
 
-        UUID id = auditLog.getId();
+        Long id = auditLog.getId();
 
         defaultAuditLogFiltering("id.equals=" + id, "id.notEquals=" + id);
+
+        defaultAuditLogFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
+
+        defaultAuditLogFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -380,6 +384,46 @@ class AuditLogResourceIT {
 
         // Get all the auditLogList where entityId is not null
         defaultAuditLogFiltering("entityId.specified=true", "entityId.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllAuditLogsByEntityIdIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedAuditLog = auditLogRepository.saveAndFlush(auditLog);
+
+        // Get all the auditLogList where entityId is greater than or equal to
+        defaultAuditLogFiltering("entityId.greaterThanOrEqual=" + DEFAULT_ENTITY_ID, "entityId.greaterThanOrEqual=" + UPDATED_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllAuditLogsByEntityIdIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedAuditLog = auditLogRepository.saveAndFlush(auditLog);
+
+        // Get all the auditLogList where entityId is less than or equal to
+        defaultAuditLogFiltering("entityId.lessThanOrEqual=" + DEFAULT_ENTITY_ID, "entityId.lessThanOrEqual=" + SMALLER_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllAuditLogsByEntityIdIsLessThanSomething() throws Exception {
+        // Initialize the database
+        insertedAuditLog = auditLogRepository.saveAndFlush(auditLog);
+
+        // Get all the auditLogList where entityId is less than
+        defaultAuditLogFiltering("entityId.lessThan=" + UPDATED_ENTITY_ID, "entityId.lessThan=" + DEFAULT_ENTITY_ID);
+    }
+
+    @Test
+    @Transactional
+    void getAllAuditLogsByEntityIdIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        insertedAuditLog = auditLogRepository.saveAndFlush(auditLog);
+
+        // Get all the auditLogList where entityId is greater than
+        defaultAuditLogFiltering("entityId.greaterThan=" + SMALLER_ENTITY_ID, "entityId.greaterThan=" + DEFAULT_ENTITY_ID);
     }
 
     @Test
@@ -712,12 +756,12 @@ class AuditLogResourceIT {
         em.flush();
         auditLog.setActor(actor);
         auditLogRepository.saveAndFlush(auditLog);
-        UUID actorId = actor.getId();
+        Long actorId = actor.getId();
         // Get all the auditLogList where actor equals to actorId
         defaultAuditLogShouldBeFound("actorId.equals=" + actorId);
 
-        // Get all the auditLogList where actor equals to UUID.randomUUID()
-        defaultAuditLogShouldNotBeFound("actorId.equals=" + UUID.randomUUID());
+        // Get all the auditLogList where actor equals to (actorId + 1)
+        defaultAuditLogShouldNotBeFound("actorId.equals=" + (actorId + 1));
     }
 
     @Test
@@ -734,12 +778,12 @@ class AuditLogResourceIT {
         em.flush();
         auditLog.setProject(project);
         auditLogRepository.saveAndFlush(auditLog);
-        UUID projectId = project.getId();
+        Long projectId = project.getId();
         // Get all the auditLogList where project equals to projectId
         defaultAuditLogShouldBeFound("projectId.equals=" + projectId);
 
-        // Get all the auditLogList where project equals to UUID.randomUUID()
-        defaultAuditLogShouldNotBeFound("projectId.equals=" + UUID.randomUUID());
+        // Get all the auditLogList where project equals to (projectId + 1)
+        defaultAuditLogShouldNotBeFound("projectId.equals=" + (projectId + 1));
     }
 
     private void defaultAuditLogFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
@@ -755,10 +799,10 @@ class AuditLogResourceIT {
             .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(auditLog.getId().toString())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(auditLog.getId().intValue())))
             .andExpect(jsonPath("$.[*].action").value(hasItem(DEFAULT_ACTION)))
             .andExpect(jsonPath("$.[*].entityName").value(hasItem(DEFAULT_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY_ID.toString())))
+            .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY_ID.intValue())))
             .andExpect(jsonPath("$.[*].level").value(hasItem(DEFAULT_LEVEL.toString())))
             .andExpect(jsonPath("$.[*].message").value(hasItem(DEFAULT_MESSAGE)))
             .andExpect(jsonPath("$.[*].principal").value(hasItem(DEFAULT_PRINCIPAL)))
@@ -799,7 +843,7 @@ class AuditLogResourceIT {
     @Transactional
     void getNonExistingAuditLog() throws Exception {
         // Get the auditLog
-        restAuditLogMockMvc.perform(get(ENTITY_API_URL_ID, UUID.randomUUID().toString())).andExpect(status().isNotFound());
+        restAuditLogMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -814,10 +858,10 @@ class AuditLogResourceIT {
             .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + auditLog.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(auditLog.getId().toString())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(auditLog.getId().intValue())))
             .andExpect(jsonPath("$.[*].action").value(hasItem(DEFAULT_ACTION)))
             .andExpect(jsonPath("$.[*].entityName").value(hasItem(DEFAULT_ENTITY_NAME)))
-            .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY_ID.toString())))
+            .andExpect(jsonPath("$.[*].entityId").value(hasItem(DEFAULT_ENTITY_ID.intValue())))
             .andExpect(jsonPath("$.[*].level").value(hasItem(DEFAULT_LEVEL.toString())))
             .andExpect(jsonPath("$.[*].message").value(hasItem(DEFAULT_MESSAGE)))
             .andExpect(jsonPath("$.[*].principal").value(hasItem(DEFAULT_PRINCIPAL)))

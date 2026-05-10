@@ -24,7 +24,7 @@ public class ProjectCriteria implements Serializable, Criteria {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private UUIDFilter id;
+    private LongFilter id;
 
     private StringFilter name;
 
@@ -34,19 +34,19 @@ public class ProjectCriteria implements Serializable, Criteria {
 
     private InstantFilter updatedAt;
 
-    private UUIDFilter ownerId;
+    private LongFilter ownerId;
 
     private Boolean distinct;
 
     public ProjectCriteria() {}
 
     public ProjectCriteria(ProjectCriteria other) {
-        this.id = other.optionalId().map(UUIDFilter::copy).orElse(null);
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.name = other.optionalName().map(StringFilter::copy).orElse(null);
         this.projectKey = other.optionalProjectKey().map(StringFilter::copy).orElse(null);
         this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
         this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
-        this.ownerId = other.optionalOwnerId().map(UUIDFilter::copy).orElse(null);
+        this.ownerId = other.optionalOwnerId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -55,22 +55,22 @@ public class ProjectCriteria implements Serializable, Criteria {
         return new ProjectCriteria(this);
     }
 
-    public UUIDFilter getId() {
+    public LongFilter getId() {
         return id;
     }
 
-    public Optional<UUIDFilter> optionalId() {
+    public Optional<LongFilter> optionalId() {
         return Optional.ofNullable(id);
     }
 
-    public UUIDFilter id() {
+    public LongFilter id() {
         if (id == null) {
-            setId(new UUIDFilter());
+            setId(new LongFilter());
         }
         return id;
     }
 
-    public void setId(UUIDFilter id) {
+    public void setId(LongFilter id) {
         this.id = id;
     }
 
@@ -150,22 +150,22 @@ public class ProjectCriteria implements Serializable, Criteria {
         this.updatedAt = updatedAt;
     }
 
-    public UUIDFilter getOwnerId() {
+    public LongFilter getOwnerId() {
         return ownerId;
     }
 
-    public Optional<UUIDFilter> optionalOwnerId() {
+    public Optional<LongFilter> optionalOwnerId() {
         return Optional.ofNullable(ownerId);
     }
 
-    public UUIDFilter ownerId() {
+    public LongFilter ownerId() {
         if (ownerId == null) {
-            setOwnerId(new UUIDFilter());
+            setOwnerId(new LongFilter());
         }
         return ownerId;
     }
 
-    public void setOwnerId(UUIDFilter ownerId) {
+    public void setOwnerId(LongFilter ownerId) {
         this.ownerId = ownerId;
     }
 

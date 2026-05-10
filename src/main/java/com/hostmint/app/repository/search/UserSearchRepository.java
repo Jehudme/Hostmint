@@ -3,7 +3,6 @@ package com.hostmint.app.repository.search;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.hostmint.app.domain.User;
 import com.hostmint.app.repository.UserRepository;
-import java.util.UUID;
 import java.util.stream.Stream;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Spring Data Elasticsearch repository for the User entity.
  */
-public interface UserSearchRepository extends ElasticsearchRepository<User, UUID>, UserSearchRepositoryInternal {}
+public interface UserSearchRepository extends ElasticsearchRepository<User, Long>, UserSearchRepositoryInternal {}
 
 interface UserSearchRepositoryInternal {
     Stream<User> search(String query);

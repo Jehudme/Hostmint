@@ -1,9 +1,9 @@
 {
   "annotations": {
-    "changelogDate": "20260423024441",
+    "changelogDate": "20260506193813",
     "readOnly": true
   },
-  "applications": ["hostMint"],
+  "applications": ["HostMint"],
   "dto": "mapstruct",
   "fields": [
     {
@@ -20,7 +20,7 @@
     },
     {
       "fieldName": "entityId",
-      "fieldType": "UUID"
+      "fieldType": "Long"
     },
     {
       "fieldName": "level",
@@ -88,5 +88,5 @@
     }
   ],
   "searchEngine": "elasticsearch",
-  "service": "serviceImpl"
+  "service": "serviceClass"
 }

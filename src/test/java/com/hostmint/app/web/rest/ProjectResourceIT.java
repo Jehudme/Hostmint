@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -24,8 +25,9 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import org.assertj.core.util.IterableUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +69,9 @@ class ProjectResourceIT {
     private static final String ENTITY_API_URL = "/api/projects";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
     private static final String ENTITY_SEARCH_API_URL = "/api/projects/_search";
+
+    private static Random random = new Random();
+    private static AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
 
     @Autowired
     private ObjectMapper om;
@@ -162,7 +167,9 @@ class ProjectResourceIT {
         ProjectDTO projectDTO = projectMapper.toDto(project);
         var returnedProjectDTO = om.readValue(
             restProjectMockMvc
-                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+                .perform(
+                    post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO))
+                )
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -189,7 +196,7 @@ class ProjectResourceIT {
     @Transactional
     void createProjectWithExistingId() throws Exception {
         // Create the Project with an existing ID
-        insertedProject = projectRepository.saveAndFlush(project);
+        project.setId(1L);
         ProjectDTO projectDTO = projectMapper.toDto(project);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
@@ -197,7 +204,7 @@ class ProjectResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restProjectMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Project in the database
@@ -218,7 +225,7 @@ class ProjectResourceIT {
         ProjectDTO projectDTO = projectMapper.toDto(project);
 
         restProjectMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
@@ -239,7 +246,7 @@ class ProjectResourceIT {
         ProjectDTO projectDTO = projectMapper.toDto(project);
 
         restProjectMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
@@ -259,7 +266,7 @@ class ProjectResourceIT {
             .perform(get(ENTITY_API_URL + "?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().toString())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].projectKey").value(hasItem(DEFAULT_PROJECT_KEY)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
@@ -294,7 +301,7 @@ class ProjectResourceIT {
             .perform(get(ENTITY_API_URL_ID, project.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.id").value(project.getId().toString()))
+            .andExpect(jsonPath("$.id").value(project.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.projectKey").value(DEFAULT_PROJECT_KEY))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
@@ -307,9 +314,13 @@ class ProjectResourceIT {
         // Initialize the database
         insertedProject = projectRepository.saveAndFlush(project);
 
-        UUID id = project.getId();
+        Long id = project.getId();
 
         defaultProjectFiltering("id.equals=" + id, "id.notEquals=" + id);
+
+        defaultProjectFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
+
+        defaultProjectFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
     }
 
     @Test
@@ -486,12 +497,12 @@ class ProjectResourceIT {
         em.flush();
         project.setOwner(owner);
         projectRepository.saveAndFlush(project);
-        UUID ownerId = owner.getId();
+        Long ownerId = owner.getId();
         // Get all the projectList where owner equals to ownerId
         defaultProjectShouldBeFound("ownerId.equals=" + ownerId);
 
-        // Get all the projectList where owner equals to UUID.randomUUID()
-        defaultProjectShouldNotBeFound("ownerId.equals=" + UUID.randomUUID());
+        // Get all the projectList where owner equals to (ownerId + 1)
+        defaultProjectShouldNotBeFound("ownerId.equals=" + (ownerId + 1));
     }
 
     private void defaultProjectFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
@@ -507,7 +518,7 @@ class ProjectResourceIT {
             .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().toString())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].projectKey").value(hasItem(DEFAULT_PROJECT_KEY)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
@@ -544,7 +555,7 @@ class ProjectResourceIT {
     @Transactional
     void getNonExistingProject() throws Exception {
         // Get the project
-        restProjectMockMvc.perform(get(ENTITY_API_URL_ID, UUID.randomUUID().toString())).andExpect(status().isNotFound());
+        restProjectMockMvc.perform(get(ENTITY_API_URL_ID, Long.MAX_VALUE)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -566,7 +577,10 @@ class ProjectResourceIT {
 
         restProjectMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, projectDTO.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO))
+                put(ENTITY_API_URL_ID, projectDTO.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(om.writeValueAsBytes(projectDTO))
             )
             .andExpect(status().isOk());
 
@@ -591,7 +605,7 @@ class ProjectResourceIT {
     void putNonExistingProject() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(projectSearchRepository.findAll());
-        project.setId(UUID.randomUUID());
+        project.setId(longCount.incrementAndGet());
 
         // Create the Project
         ProjectDTO projectDTO = projectMapper.toDto(project);
@@ -599,7 +613,10 @@ class ProjectResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProjectMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, projectDTO.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO))
+                put(ENTITY_API_URL_ID, projectDTO.getId())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(om.writeValueAsBytes(projectDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -614,7 +631,7 @@ class ProjectResourceIT {
     void putWithIdMismatchProject() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(projectSearchRepository.findAll());
-        project.setId(UUID.randomUUID());
+        project.setId(longCount.incrementAndGet());
 
         // Create the Project
         ProjectDTO projectDTO = projectMapper.toDto(project);
@@ -622,7 +639,10 @@ class ProjectResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProjectMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO))
+                put(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(om.writeValueAsBytes(projectDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -637,14 +657,14 @@ class ProjectResourceIT {
     void putWithMissingIdPathParamProject() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(projectSearchRepository.findAll());
-        project.setId(UUID.randomUUID());
+        project.setId(longCount.incrementAndGet());
 
         // Create the Project
         ProjectDTO projectDTO = projectMapper.toDto(project);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProjectMockMvc
-            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Project in the database
@@ -665,11 +685,12 @@ class ProjectResourceIT {
         Project partialUpdatedProject = new Project();
         partialUpdatedProject.setId(project.getId());
 
-        partialUpdatedProject.name(UPDATED_NAME).projectKey(UPDATED_PROJECT_KEY);
+        partialUpdatedProject.projectKey(UPDATED_PROJECT_KEY).createdAt(UPDATED_CREATED_AT).updatedAt(UPDATED_UPDATED_AT);
 
         restProjectMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedProject.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(partialUpdatedProject))
             )
@@ -702,6 +723,7 @@ class ProjectResourceIT {
         restProjectMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedProject.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(partialUpdatedProject))
             )
@@ -718,7 +740,7 @@ class ProjectResourceIT {
     void patchNonExistingProject() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(projectSearchRepository.findAll());
-        project.setId(UUID.randomUUID());
+        project.setId(longCount.incrementAndGet());
 
         // Create the Project
         ProjectDTO projectDTO = projectMapper.toDto(project);
@@ -727,6 +749,7 @@ class ProjectResourceIT {
         restProjectMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, projectDTO.getId())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(projectDTO))
             )
@@ -743,7 +766,7 @@ class ProjectResourceIT {
     void patchWithIdMismatchProject() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(projectSearchRepository.findAll());
-        project.setId(UUID.randomUUID());
+        project.setId(longCount.incrementAndGet());
 
         // Create the Project
         ProjectDTO projectDTO = projectMapper.toDto(project);
@@ -751,7 +774,8 @@ class ProjectResourceIT {
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProjectMockMvc
             .perform(
-                patch(ENTITY_API_URL_ID, UUID.randomUUID())
+                patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
+                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(projectDTO))
             )
@@ -768,14 +792,16 @@ class ProjectResourceIT {
     void patchWithMissingIdPathParamProject() throws Exception {
         long databaseSizeBeforeUpdate = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(projectSearchRepository.findAll());
-        project.setId(UUID.randomUUID());
+        project.setId(longCount.incrementAndGet());
 
         // Create the Project
         ProjectDTO projectDTO = projectMapper.toDto(project);
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProjectMockMvc
-            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(projectDTO)))
+            .perform(
+                patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(projectDTO))
+            )
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Project in the database
@@ -798,7 +824,7 @@ class ProjectResourceIT {
 
         // Delete the project
         restProjectMockMvc
-            .perform(delete(ENTITY_API_URL_ID, project.getId().toString()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, project.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
@@ -819,7 +845,7 @@ class ProjectResourceIT {
             .perform(get(ENTITY_SEARCH_API_URL + "?query=id:" + project.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().toString())))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].projectKey").value(hasItem(DEFAULT_PROJECT_KEY)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))

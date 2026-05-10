@@ -81,10 +81,10 @@ public class AuditLogQueryService extends QueryService<AuditLog> {
             // This has to be called first, because the distinct method returns null
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : Specification.unrestricted(),
-                buildSpecification(criteria.getId(), AuditLog_.id),
+                buildRangeSpecification(criteria.getId(), AuditLog_.id),
                 buildStringSpecification(criteria.getAction(), AuditLog_.action),
                 buildStringSpecification(criteria.getEntityName(), AuditLog_.entityName),
-                buildSpecification(criteria.getEntityId(), AuditLog_.entityId),
+                buildRangeSpecification(criteria.getEntityId(), AuditLog_.entityId),
                 buildSpecification(criteria.getLevel(), AuditLog_.level),
                 buildStringSpecification(criteria.getMessage(), AuditLog_.message),
                 buildStringSpecification(criteria.getPrincipal(), AuditLog_.principal),

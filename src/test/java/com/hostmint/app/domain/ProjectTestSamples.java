@@ -1,18 +1,23 @@
 package com.hostmint.app.domain;
 
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ProjectTestSamples {
 
+    private static final Random random = new Random();
+    private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2L * Integer.MAX_VALUE));
+
     public static Project getProjectSample1() {
-        return new Project().id(UUID.fromString("23d8dc04-a48b-45d9-a01d-4b728f0ad4aa")).name("name1").projectKey("projectKey1");
+        return new Project().id(1L).name("name1").projectKey("projectKey1");
     }
 
     public static Project getProjectSample2() {
-        return new Project().id(UUID.fromString("ad79f240-3727-46c3-b89f-2cf6ebd74367")).name("name2").projectKey("projectKey2");
+        return new Project().id(2L).name("name2").projectKey("projectKey2");
     }
 
     public static Project getProjectRandomSampleGenerator() {
-        return new Project().id(UUID.randomUUID()).name(UUID.randomUUID().toString()).projectKey(UUID.randomUUID().toString());
+        return new Project().id(longCount.incrementAndGet()).name(UUID.randomUUID().toString()).projectKey(UUID.randomUUID().toString());
     }
 }

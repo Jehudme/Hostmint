@@ -1,8 +1,8 @@
 {
   "annotations": {
-    "changelogDate": "20260423024440"
+    "changelogDate": "20260506193713"
   },
-  "applications": ["hostMint"],
+  "applications": ["HostMint"],
   "dto": "mapstruct",
   "fields": [
     {
@@ -44,5 +44,5 @@
     }
   ],
   "searchEngine": "elasticsearch",
-  "service": "serviceImpl"
+  "service": "serviceClass"
 }

@@ -4,7 +4,6 @@ import com.hostmint.app.domain.User;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A DTO representing a user, with only the public attributes.
@@ -14,7 +13,7 @@ public class UserDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
+    private Long id;
 
     private String login;
 
@@ -28,11 +27,11 @@ public class UserDTO implements Serializable {
         this.login = user.getLogin();
     }
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

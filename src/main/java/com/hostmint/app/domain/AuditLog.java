@@ -7,7 +7,6 @@ import jakarta.validation.constraints.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -25,9 +24,11 @@ public class AuditLog implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
     @Column(name = "id")
-    private UUID id;
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Long)
+    private Long id;
 
     @NotNull
     @Size(max = 120)
@@ -64,7 +65,8 @@ public class AuditLog implements Serializable {
     private String entityName;
 
     @Column(name = "entity_id")
-    private UUID entityId;
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Long)
+    private Long entityId;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -186,16 +188,16 @@ public class AuditLog implements Serializable {
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public UUID getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public AuditLog id(UUID id) {
+    public AuditLog id(Long id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -225,16 +227,16 @@ public class AuditLog implements Serializable {
         this.entityName = entityName;
     }
 
-    public UUID getEntityId() {
+    public Long getEntityId() {
         return this.entityId;
     }
 
-    public AuditLog entityId(UUID entityId) {
+    public AuditLog entityId(Long entityId) {
         this.setEntityId(entityId);
         return this;
     }
 
-    public void setEntityId(UUID entityId) {
+    public void setEntityId(Long entityId) {
         this.entityId = entityId;
     }
 
@@ -394,7 +396,7 @@ public class AuditLog implements Serializable {
             "id=" + getId() +
             ", action='" + getAction() + "'" +
             ", entityName='" + getEntityName() + "'" +
-            ", entityId='" + getEntityId() + "'" +
+            ", entityId=" + getEntityId() +
             ", level='" + getLevel() + "'" +
             ", message='" + getMessage() + "'" +
             ", principal='" + getPrincipal() + "'" +

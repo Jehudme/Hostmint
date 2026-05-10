@@ -81,7 +81,7 @@ public class ProjectQueryService extends QueryService<Project> {
             // This has to be called first, because the distinct method returns null
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : Specification.unrestricted(),
-                buildSpecification(criteria.getId(), Project_.id),
+                buildRangeSpecification(criteria.getId(), Project_.id),
                 buildStringSpecification(criteria.getName(), Project_.name),
                 buildStringSpecification(criteria.getProjectKey(), Project_.projectKey),
                 buildRangeSpecification(criteria.getCreatedAt(), Project_.createdAt),
