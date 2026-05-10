@@ -4,6 +4,7 @@
     "authenticationType": "session",
     "baseName": "HostMint",
     "buildTool": "maven",
+    "creationTimestamp": 1778428060886,
     "databaseType": "sql",
     "devDatabaseType": "h2Disk",
     "enableTranslation": true,
