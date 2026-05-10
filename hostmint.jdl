@@ -16,7 +16,7 @@ application {
     searchEngine elasticsearch
     testFrameworks [cypress]
   }
-  entities Project, AuditLog, RequestLog
+  entities Project, AuditLog
 }
 
 /* ---------------------------------------------------------
@@ -34,7 +34,7 @@ entity Project {
 entity AuditLog {
   action String required maxlength(120)
   entityName String required maxlength(120)
-  entityId Long // Changed to Long to match
+  entityId Long
   level LogLevel required
   message String required maxlength(1000)
   principal String maxlength(255)
@@ -42,20 +42,6 @@ entity AuditLog {
   ipAddress String maxlength(64)
   userAgent String maxlength(500)
   metadata TextBlob
-  createdAt Instant
-}
-
-@readOnly
-entity RequestLog {
-  correlationId String required maxlength(128)
-  method HttpMethod required
-  path String required maxlength(500)
-  statusCode Integer required min(100) max(599)
-  durationMs Long required min(0)
-  principal String maxlength(255)
-  ipAddress String maxlength(64)
-  errorCode String maxlength(120)
-  errorMessage String maxlength(1000)
   createdAt Instant
 }
 
@@ -70,12 +56,10 @@ enum HttpMethod {
 relationship ManyToOne {
   Project{owner(login) required} to User with builtInEntity
   AuditLog{actor(login)} to User with builtInEntity
-  RequestLog{actor(login)} to User with builtInEntity
   AuditLog{project(projectKey)} to Project
-  RequestLog{project(projectKey)} to Project
 }
 
 dto * with mapstruct
 paginate * with pagination
 filter *
-search Project, AuditLog, RequestLog with elasticsearch
+search Project, AuditLog with elasticsearch

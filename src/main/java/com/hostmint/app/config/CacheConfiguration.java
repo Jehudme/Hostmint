@@ -48,7 +48,6 @@ public class CacheConfiguration {
             createCache(cm, com.hostmint.app.domain.User.class.getName() + ".persistentTokens");
             createCache(cm, com.hostmint.app.domain.Project.class.getName());
             createCache(cm, com.hostmint.app.domain.AuditLog.class.getName());
-            createCache(cm, com.hostmint.app.domain.RequestLog.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
