@@ -4,6 +4,7 @@ import com.hostmint.app.config.ApplicationProperties;
 import com.hostmint.app.config.CRLFLogConverter;
 // --- VAADIN IMPORTS ---
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.ColorScheme;
 import com.vaadin.flow.component.page.Push;
@@ -11,7 +12,6 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.aura.Aura;
 import com.vaadin.flow.theme.lumo.Lumo;
 // ----------------------
-
 import jakarta.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -36,6 +36,8 @@ import tech.jhipster.config.JHipsterConstants;
 @EnableElasticsearchRepositories("com.hostmint.app.repository.search")
 @StyleSheet(Aura.STYLESHEET)
 @Push
+@StyleSheet("styles.css")
+@StyleSheet("styles.css")
 public class HostMintApp implements AppShellConfigurator {
 
     private static final Logger LOG = LoggerFactory.getLogger(HostMintApp.class);
