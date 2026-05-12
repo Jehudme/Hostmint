@@ -49,6 +49,7 @@ public class ProjectAsserts {
             .as("Verify Project relevant properties")
             .satisfies(a -> assertThat(a.getName()).as("check name").isEqualTo(expected.getName()))
             .satisfies(a -> assertThat(a.getProjectKey()).as("check projectKey").isEqualTo(expected.getProjectKey()))
+            .satisfies(a -> assertThat(a.getDeleted()).as("check deleted").isEqualTo(expected.getDeleted()))
             .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
             .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()));
     }

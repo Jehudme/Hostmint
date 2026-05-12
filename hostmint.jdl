@@ -1,10 +1,9 @@
-
 application {
   config {
     baseName HostMint
     applicationType monolith
     packageName com.hostmint.app
-    authenticationType session
+    authenticationType jwt
     buildTool maven
     skipClient true
     databaseType sql
@@ -14,18 +13,19 @@ application {
     nativeLanguage en
     languages [fr, en]
     searchEngine elasticsearch
-    testFrameworks [cypress]
   }
   entities Project, AuditLog
 }
 
 /* ---------------------------------------------------------
-   ENTITIES (Defaulting to Long IDs)
+   ENTITIES
    --------------------------------------------------------- */
+
 
 entity Project {
   name String required minlength(2) maxlength(140)
   projectKey String required unique minlength(2) maxlength(20) pattern(/^[A-Z0-9_]+$/)
+  deleted Boolean
   createdAt Instant
   updatedAt Instant
 }
@@ -49,17 +49,17 @@ enum LogLevel {
   INFO, WARN, ERROR, DEBUG, TRACE
 }
 
-enum HttpMethod {
-  GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS
-}
-
 relationship ManyToOne {
   Project{owner(login) required} to User with builtInEntity
   AuditLog{actor(login)} to User with builtInEntity
   AuditLog{project(projectKey)} to Project
 }
 
+/* ---------------------------------------------------------
+   OPTIONS
+   --------------------------------------------------------- */
 dto * with mapstruct
 paginate * with pagination
 filter *
 search Project, AuditLog with elasticsearch
+service * with serviceClass

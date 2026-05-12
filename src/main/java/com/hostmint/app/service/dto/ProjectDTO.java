@@ -22,6 +22,8 @@ public class ProjectDTO implements Serializable {
     @Pattern(regexp = "^[A-Z0-9_]+$")
     private String projectKey;
 
+    private Boolean deleted;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -51,6 +53,14 @@ public class ProjectDTO implements Serializable {
 
     public void setProjectKey(String projectKey) {
         this.projectKey = projectKey;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Instant getCreatedAt() {
@@ -105,6 +115,7 @@ public class ProjectDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", projectKey='" + getProjectKey() + "'" +
+            ", deleted='" + getDeleted() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
             ", owner=" + getOwner() +

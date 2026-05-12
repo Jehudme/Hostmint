@@ -1,7 +1,9 @@
 package com.hostmint.app.security;
 
+import static com.hostmint.app.security.SecurityUtils.USER_ID_CLAIM;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
  * Test class for the {@link SecurityUtils} utility class.
@@ -30,6 +33,32 @@ class SecurityUtilsUnitTest {
         SecurityContextHolder.setContext(securityContext);
         Optional<String> login = SecurityUtils.getCurrentUserLogin();
         assertThat(login).contains("admin");
+    }
+
+    @Test
+    void testGetCurrentUserJWT() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("admin", "token"));
+        SecurityContextHolder.setContext(securityContext);
+        Optional<String> jwt = SecurityUtils.getCurrentUserJWT();
+        assertThat(jwt).contains("token");
+    }
+
+    @Test
+    void testGetCurrentUserId() {
+        var userId = 1L;
+        var securityContext = SecurityContextHolder.createEmptyContext();
+        var now = Instant.now();
+        var jwt = Jwt.withTokenValue("token")
+            .issuedAt(now)
+            .expiresAt(now.plusSeconds(60))
+            .claim(USER_ID_CLAIM, userId)
+            .header("Test", "test")
+            .build();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(jwt, "token"));
+        SecurityContextHolder.setContext(securityContext);
+        var contextUserId = SecurityUtils.getCurrentUserId();
+        assertThat(contextUserId.orElse(null)).isEqualTo(userId);
     }
 
     @Test

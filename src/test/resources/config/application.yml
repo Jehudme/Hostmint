@@ -28,6 +28,12 @@ spring:
     allow-bean-definition-overriding: true
   messages:
     basename: i18n/messages
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          authority-prefix: ''
+          authorities-claim-name: auth
   task:
     execution:
       thread-name-prefix: host-mint-task-
@@ -64,9 +70,13 @@ jhipster:
       port: 5000
       ring-buffer-size: 512
   security:
-    remember-me:
-      # security key (this key should be unique for your application, and kept secret)
-      key: 5aed3f94077f847de34d9350fbbc2730f4054f455fd75662f33d73939ee4caf0c3438f7b1db98f45c48168f97bc9d7312763
+    authentication:
+      jwt:
+        # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
+        base64-secret: ZDljMzc3MTJkN2JlYzQ0MTZjZDgzMjk2YWNiMWJjMjAxNzZhMTA2Mjk4NjdmNTZkNWE2MzNlMmFhOTFlNTQyMDU3MDMyNTE5OWVmNjI5NjAwM2VkMDUzYTFmYzc3YjhhZTgwMzZmYzVjNjdhOWIwYTBkYmRiZGY1OTQ1MWY1NzQ=
+        # Token is valid 24 hours
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 86400
 
 # ===================================================================
 # Application specific properties

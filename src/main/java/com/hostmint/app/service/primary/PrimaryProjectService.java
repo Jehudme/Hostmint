@@ -1,6 +1,6 @@
 package com.hostmint.app.service.primary;
 
-import com.hostmint.app.aop.audit.Auditable;
+import com.hostmint.app.aop.auditt.Auditable;
 import com.hostmint.app.repository.ProjectRepository;
 import com.hostmint.app.repository.search.ProjectSearchRepository;
 import com.hostmint.app.service.ProjectService;

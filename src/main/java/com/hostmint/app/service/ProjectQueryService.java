@@ -84,6 +84,7 @@ public class ProjectQueryService extends QueryService<Project> {
                 buildRangeSpecification(criteria.getId(), Project_.id),
                 buildStringSpecification(criteria.getName(), Project_.name),
                 buildStringSpecification(criteria.getProjectKey(), Project_.projectKey),
+                buildSpecification(criteria.getDeleted(), Project_.deleted),
                 buildRangeSpecification(criteria.getCreatedAt(), Project_.createdAt),
                 buildRangeSpecification(criteria.getUpdatedAt(), Project_.updatedAt),
                 buildSpecification(criteria.getOwnerId(), root -> root.join(Project_.owner, JoinType.LEFT).get(User_.id))

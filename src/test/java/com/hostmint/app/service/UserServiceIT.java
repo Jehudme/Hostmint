@@ -7,13 +7,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.hostmint.app.IntegrationTest;
-import com.hostmint.app.domain.PersistentToken;
 import com.hostmint.app.domain.User;
-import com.hostmint.app.repository.PersistentTokenRepository;
 import com.hostmint.app.repository.UserRepository;
 import com.hostmint.app.repository.search.UserSearchRepository;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -54,9 +51,6 @@ class UserServiceIT {
     private static final String DEFAULT_IMAGEURL = "http://placehold.it/50x50";
 
     private static final String DEFAULT_LANGKEY = "dummy";
-
-    @Autowired
-    private PersistentTokenRepository persistentTokenRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -111,23 +105,9 @@ class UserServiceIT {
             .map(cacheName -> this.cacheManager.getCache(cacheName))
             .filter(Objects::nonNull)
             .forEach(Cache::clear);
-        persistentTokenRepository.deleteAll();
         userService.deleteUser(DEFAULT_LOGIN);
         assertThat(userRepository.count()).isEqualTo(numberOfUsers);
         numberOfUsers = null;
-    }
-
-    @Test
-    @Transactional
-    void testRemoveOldPersistentTokens() {
-        userRepository.saveAndFlush(user);
-        int existingCount = persistentTokenRepository.findByUser(user).size();
-        LocalDate today = LocalDate.now();
-        generateUserToken(user, "1111-1111", today);
-        generateUserToken(user, "2222-2222", today.minusDays(32));
-        assertThat(persistentTokenRepository.findByUser(user)).hasSize(existingCount + 2);
-        userService.removeOldPersistentTokens();
-        assertThat(persistentTokenRepository.findByUser(user)).hasSize(existingCount + 1);
     }
 
     @Test
@@ -243,16 +223,5 @@ class UserServiceIT {
 
         // Verify Elasticsearch mock
         verify(spiedUserSearchRepository, never()).deleteFromIndex(user);
-    }
-
-    private void generateUserToken(User user, String tokenSeries, LocalDate localDate) {
-        PersistentToken token = new PersistentToken();
-        token.setSeries(tokenSeries);
-        token.setUser(user);
-        token.setTokenValue(tokenSeries + "-data");
-        token.setTokenDate(localDate);
-        token.setIpAddress("127.0.0.1");
-        token.setUserAgent("Test agent");
-        persistentTokenRepository.saveAndFlush(token);
     }
 }

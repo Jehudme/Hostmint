@@ -97,11 +97,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    private Set<PersistentToken> persistentTokens = new HashSet<>();
-
     public Long getId() {
         return id;
     }
@@ -205,14 +200,6 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
-    }
-
-    public Set<PersistentToken> getPersistentTokens() {
-        return persistentTokens;
-    }
-
-    public void setPersistentTokens(Set<PersistentToken> persistentTokens) {
-        this.persistentTokens = persistentTokens;
     }
 
     @Override

@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,6 +58,9 @@ class ProjectResourceIT {
 
     private static final String DEFAULT_PROJECT_KEY = "AAAAAAAAAA";
     private static final String UPDATED_PROJECT_KEY = "BBBBBBBBBB";
+
+    private static final Boolean DEFAULT_DELETED = false;
+    private static final Boolean UPDATED_DELETED = true;
 
     private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -114,6 +116,7 @@ class ProjectResourceIT {
         Project project = new Project()
             .name(DEFAULT_NAME)
             .projectKey(DEFAULT_PROJECT_KEY)
+            .deleted(DEFAULT_DELETED)
             .createdAt(DEFAULT_CREATED_AT)
             .updatedAt(DEFAULT_UPDATED_AT);
         // Add required entity
@@ -134,6 +137,7 @@ class ProjectResourceIT {
         Project updatedProject = new Project()
             .name(UPDATED_NAME)
             .projectKey(UPDATED_PROJECT_KEY)
+            .deleted(UPDATED_DELETED)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT);
         // Add required entity
@@ -167,9 +171,7 @@ class ProjectResourceIT {
         ProjectDTO projectDTO = projectMapper.toDto(project);
         var returnedProjectDTO = om.readValue(
             restProjectMockMvc
-                .perform(
-                    post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO))
-                )
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
@@ -204,7 +206,7 @@ class ProjectResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restProjectMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Project in the database
@@ -225,7 +227,7 @@ class ProjectResourceIT {
         ProjectDTO projectDTO = projectMapper.toDto(project);
 
         restProjectMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
@@ -246,7 +248,7 @@ class ProjectResourceIT {
         ProjectDTO projectDTO = projectMapper.toDto(project);
 
         restProjectMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isBadRequest());
 
         assertSameRepositoryCount(databaseSizeBeforeTest);
@@ -269,6 +271,7 @@ class ProjectResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].projectKey").value(hasItem(DEFAULT_PROJECT_KEY)))
+            .andExpect(jsonPath("$.[*].deleted").value(hasItem(DEFAULT_DELETED)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
             .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
     }
@@ -304,6 +307,7 @@ class ProjectResourceIT {
             .andExpect(jsonPath("$.id").value(project.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.projectKey").value(DEFAULT_PROJECT_KEY))
+            .andExpect(jsonPath("$.deleted").value(DEFAULT_DELETED))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
             .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()));
     }
@@ -425,6 +429,36 @@ class ProjectResourceIT {
 
     @Test
     @Transactional
+    void getAllProjectsByDeletedIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedProject = projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where deleted equals to
+        defaultProjectFiltering("deleted.equals=" + DEFAULT_DELETED, "deleted.equals=" + UPDATED_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllProjectsByDeletedIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedProject = projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where deleted in
+        defaultProjectFiltering("deleted.in=" + DEFAULT_DELETED + "," + UPDATED_DELETED, "deleted.in=" + UPDATED_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllProjectsByDeletedIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedProject = projectRepository.saveAndFlush(project);
+
+        // Get all the projectList where deleted is not null
+        defaultProjectFiltering("deleted.specified=true", "deleted.specified=false");
+    }
+
+    @Test
+    @Transactional
     void getAllProjectsByCreatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedProject = projectRepository.saveAndFlush(project);
@@ -521,6 +555,7 @@ class ProjectResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].projectKey").value(hasItem(DEFAULT_PROJECT_KEY)))
+            .andExpect(jsonPath("$.[*].deleted").value(hasItem(DEFAULT_DELETED)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
             .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
 
@@ -572,15 +607,17 @@ class ProjectResourceIT {
         Project updatedProject = projectRepository.findById(project.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedProject are not directly saved in db
         em.detach(updatedProject);
-        updatedProject.name(UPDATED_NAME).projectKey(UPDATED_PROJECT_KEY).createdAt(UPDATED_CREATED_AT).updatedAt(UPDATED_UPDATED_AT);
+        updatedProject
+            .name(UPDATED_NAME)
+            .projectKey(UPDATED_PROJECT_KEY)
+            .deleted(UPDATED_DELETED)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT);
         ProjectDTO projectDTO = projectMapper.toDto(updatedProject);
 
         restProjectMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, projectDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(projectDTO))
+                put(ENTITY_API_URL_ID, projectDTO.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO))
             )
             .andExpect(status().isOk());
 
@@ -613,10 +650,7 @@ class ProjectResourceIT {
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restProjectMockMvc
             .perform(
-                put(ENTITY_API_URL_ID, projectDTO.getId())
-                    .with(csrf())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(om.writeValueAsBytes(projectDTO))
+                put(ENTITY_API_URL_ID, projectDTO.getId()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO))
             )
             .andExpect(status().isBadRequest());
 
@@ -640,7 +674,6 @@ class ProjectResourceIT {
         restProjectMockMvc
             .perform(
                 put(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(om.writeValueAsBytes(projectDTO))
             )
@@ -664,7 +697,7 @@ class ProjectResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProjectMockMvc
-            .perform(put(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
+            .perform(put(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Project in the database
@@ -685,12 +718,15 @@ class ProjectResourceIT {
         Project partialUpdatedProject = new Project();
         partialUpdatedProject.setId(project.getId());
 
-        partialUpdatedProject.projectKey(UPDATED_PROJECT_KEY).createdAt(UPDATED_CREATED_AT).updatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedProject
+            .projectKey(UPDATED_PROJECT_KEY)
+            .deleted(UPDATED_DELETED)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT);
 
         restProjectMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedProject.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(partialUpdatedProject))
             )
@@ -717,13 +753,13 @@ class ProjectResourceIT {
         partialUpdatedProject
             .name(UPDATED_NAME)
             .projectKey(UPDATED_PROJECT_KEY)
+            .deleted(UPDATED_DELETED)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT);
 
         restProjectMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedProject.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(partialUpdatedProject))
             )
@@ -749,7 +785,6 @@ class ProjectResourceIT {
         restProjectMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, projectDTO.getId())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(projectDTO))
             )
@@ -775,7 +810,6 @@ class ProjectResourceIT {
         restProjectMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, longCount.incrementAndGet())
-                    .with(csrf())
                     .contentType("application/merge-patch+json")
                     .content(om.writeValueAsBytes(projectDTO))
             )
@@ -799,9 +833,7 @@ class ProjectResourceIT {
 
         // If url ID doesn't match entity ID, it will throw BadRequestAlertException
         restProjectMockMvc
-            .perform(
-                patch(ENTITY_API_URL).with(csrf()).contentType("application/merge-patch+json").content(om.writeValueAsBytes(projectDTO))
-            )
+            .perform(patch(ENTITY_API_URL).contentType("application/merge-patch+json").content(om.writeValueAsBytes(projectDTO)))
             .andExpect(status().isMethodNotAllowed());
 
         // Validate the Project in the database
@@ -824,7 +856,7 @@ class ProjectResourceIT {
 
         // Delete the project
         restProjectMockMvc
-            .perform(delete(ENTITY_API_URL_ID, project.getId()).with(csrf()).accept(MediaType.APPLICATION_JSON))
+            .perform(delete(ENTITY_API_URL_ID, project.getId()).accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
@@ -848,6 +880,7 @@ class ProjectResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(project.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].projectKey").value(hasItem(DEFAULT_PROJECT_KEY)))
+            .andExpect(jsonPath("$.[*].deleted").value(hasItem(DEFAULT_DELETED)))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
             .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
     }

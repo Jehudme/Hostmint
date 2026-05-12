@@ -63,6 +63,10 @@ public class Project implements Serializable {
     )
     private String projectKey;
 
+    @Column(name = "deleted")
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    private Boolean deleted;
+
     @Column(name = "created_at")
     @org.springframework.data.elasticsearch.annotations.Field(
         type = org.springframework.data.elasticsearch.annotations.FieldType.Date,
@@ -120,6 +124,19 @@ public class Project implements Serializable {
 
     public void setProjectKey(String projectKey) {
         this.projectKey = projectKey;
+    }
+
+    public Boolean getDeleted() {
+        return this.deleted;
+    }
+
+    public Project deleted(Boolean deleted) {
+        this.setDeleted(deleted);
+        return this;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Instant getCreatedAt() {
@@ -187,6 +204,7 @@ public class Project implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", projectKey='" + getProjectKey() + "'" +
+            ", deleted='" + getDeleted() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
             "}";

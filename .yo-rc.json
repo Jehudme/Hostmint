@@ -1,23 +1,21 @@
 {
   "generator-jhipster": {
     "applicationType": "monolith",
-    "authenticationType": "session",
+    "authenticationType": "jwt",
     "baseName": "HostMint",
     "buildTool": "maven",
-    "creationTimestamp": 1778428060886,
     "databaseType": "sql",
     "devDatabaseType": "h2Disk",
     "enableTranslation": true,
-    "entities": ["Project", "AuditLog", "RequestLog"],
+    "entities": ["Project", "AuditLog"],
     "jhipsterVersion": "9.0.0",
+    "jwtSecretKey": "ZDljMzc3MTJkN2JlYzQ0MTZjZDgzMjk2YWNiMWJjMjAxNzZhMTA2Mjk4NjdmNTZkNWE2MzNlMmFhOTFlNTQyMDU3MDMyNTE5OWVmNjI5NjAwM2VkMDUzYTFmYzc3YjhhZTgwMzZmYzVjNjdhOWIwYTBkYmRiZGY1OTQ1MWY1NzQ=",
     "languages": ["en", "fr"],
-    "lastLiquibaseTimestamp": 1778096353000,
+    "lastLiquibaseTimestamp": 1778607936000,
     "nativeLanguage": "en",
     "packageName": "com.hostmint.app",
     "prodDatabaseType": "postgresql",
-    "rememberMeKey": "5aed3f94077f847de34d9350fbbc2730f4054f455fd75662f33d73939ee4caf0c3438f7b1db98f45c48168f97bc9d7312763",
     "searchEngine": "elasticsearch",
-    "skipClient": true,
-    "testFrameworks": ["cypress"]
+    "skipClient": true
   }
 }

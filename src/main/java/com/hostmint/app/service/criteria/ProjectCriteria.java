@@ -30,6 +30,8 @@ public class ProjectCriteria implements Serializable, Criteria {
 
     private StringFilter projectKey;
 
+    private BooleanFilter deleted;
+
     private InstantFilter createdAt;
 
     private InstantFilter updatedAt;
@@ -44,6 +46,7 @@ public class ProjectCriteria implements Serializable, Criteria {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.name = other.optionalName().map(StringFilter::copy).orElse(null);
         this.projectKey = other.optionalProjectKey().map(StringFilter::copy).orElse(null);
+        this.deleted = other.optionalDeleted().map(BooleanFilter::copy).orElse(null);
         this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
         this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
         this.ownerId = other.optionalOwnerId().map(LongFilter::copy).orElse(null);
@@ -110,6 +113,25 @@ public class ProjectCriteria implements Serializable, Criteria {
 
     public void setProjectKey(StringFilter projectKey) {
         this.projectKey = projectKey;
+    }
+
+    public BooleanFilter getDeleted() {
+        return deleted;
+    }
+
+    public Optional<BooleanFilter> optionalDeleted() {
+        return Optional.ofNullable(deleted);
+    }
+
+    public BooleanFilter deleted() {
+        if (deleted == null) {
+            setDeleted(new BooleanFilter());
+        }
+        return deleted;
+    }
+
+    public void setDeleted(BooleanFilter deleted) {
+        this.deleted = deleted;
     }
 
     public InstantFilter getCreatedAt() {
@@ -201,6 +223,7 @@ public class ProjectCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(projectKey, that.projectKey) &&
+            Objects.equals(deleted, that.deleted) &&
             Objects.equals(createdAt, that.createdAt) &&
             Objects.equals(updatedAt, that.updatedAt) &&
             Objects.equals(ownerId, that.ownerId) &&
@@ -210,7 +233,7 @@ public class ProjectCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, projectKey, createdAt, updatedAt, ownerId, distinct);
+        return Objects.hash(id, name, projectKey, deleted, createdAt, updatedAt, ownerId, distinct);
     }
 
     // prettier-ignore
@@ -220,6 +243,7 @@ public class ProjectCriteria implements Serializable, Criteria {
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
             optionalName().map(f -> "name=" + f + ", ").orElse("") +
             optionalProjectKey().map(f -> "projectKey=" + f + ", ").orElse("") +
+            optionalDeleted().map(f -> "deleted=" + f + ", ").orElse("") +
             optionalCreatedAt().map(f -> "createdAt=" + f + ", ").orElse("") +
             optionalUpdatedAt().map(f -> "updatedAt=" + f + ", ").orElse("") +
             optionalOwnerId().map(f -> "ownerId=" + f + ", ").orElse("") +

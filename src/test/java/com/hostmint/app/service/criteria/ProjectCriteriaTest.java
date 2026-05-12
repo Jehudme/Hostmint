@@ -78,6 +78,7 @@ class ProjectCriteriaTest {
         projectCriteria.id();
         projectCriteria.name();
         projectCriteria.projectKey();
+        projectCriteria.deleted();
         projectCriteria.createdAt();
         projectCriteria.updatedAt();
         projectCriteria.ownerId();
@@ -90,6 +91,7 @@ class ProjectCriteriaTest {
                 condition.apply(criteria.getId()) &&
                 condition.apply(criteria.getName()) &&
                 condition.apply(criteria.getProjectKey()) &&
+                condition.apply(criteria.getDeleted()) &&
                 condition.apply(criteria.getCreatedAt()) &&
                 condition.apply(criteria.getUpdatedAt()) &&
                 condition.apply(criteria.getOwnerId()) &&
@@ -104,6 +106,7 @@ class ProjectCriteriaTest {
                 condition.apply(criteria.getId(), copy.getId()) &&
                 condition.apply(criteria.getName(), copy.getName()) &&
                 condition.apply(criteria.getProjectKey(), copy.getProjectKey()) &&
+                condition.apply(criteria.getDeleted(), copy.getDeleted()) &&
                 condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
                 condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
                 condition.apply(criteria.getOwnerId(), copy.getOwnerId()) &&

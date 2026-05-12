@@ -1,6 +1,6 @@
 package com.hostmint.app.service.primary;
 
-import com.hostmint.app.aop.audit.Auditable;
+import com.hostmint.app.aop.auditt.Auditable;
 import com.hostmint.app.domain.User;
 import com.hostmint.app.repository.AuthorityRepository;
 import com.hostmint.app.repository.PersistentTokenRepository;

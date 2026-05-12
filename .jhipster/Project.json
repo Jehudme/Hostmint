@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "changelogDate": "20260506193713"
+    "changelogDate": "20260512174436"
   },
   "applications": ["HostMint"],
   "dto": "mapstruct",
@@ -19,6 +19,10 @@
       "fieldValidateRulesMaxlength": "20",
       "fieldValidateRulesMinlength": "2",
       "fieldValidateRulesPattern": "^[A-Z0-9_]+$"
+    },
+    {
+      "fieldName": "deleted",
+      "fieldType": "Boolean"
     },
     {
       "fieldName": "createdAt",
