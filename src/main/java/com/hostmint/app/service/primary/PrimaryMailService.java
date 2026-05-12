@@ -1,6 +1,6 @@
 package com.hostmint.app.service.primary;
 
-import com.hostmint.app.aop.auditt.Auditable;
+import com.hostmint.app.aop.audit.Auditable;
 import com.hostmint.app.service.MailService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Primary;

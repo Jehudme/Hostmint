@@ -1,9 +1,8 @@
 package com.hostmint.app.service.primary;
 
-import com.hostmint.app.aop.auditt.Auditable;
+import com.hostmint.app.aop.audit.Auditable;
 import com.hostmint.app.domain.User;
 import com.hostmint.app.repository.AuthorityRepository;
-import com.hostmint.app.repository.PersistentTokenRepository;
 import com.hostmint.app.repository.UserRepository;
 import com.hostmint.app.repository.search.UserSearchRepository;
 import com.hostmint.app.service.UserService;
@@ -22,11 +21,10 @@ public class PrimaryUserService extends UserService {
         UserRepository userRepository,
         PasswordEncoder passwordEncoder,
         UserSearchRepository userSearchRepository,
-        PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository,
         CacheManager cacheManager
     ) {
-        super(userRepository, passwordEncoder, userSearchRepository, persistentTokenRepository, authorityRepository, cacheManager);
+        super(userRepository, passwordEncoder, userSearchRepository, authorityRepository, cacheManager);
     }
 
     @Override
