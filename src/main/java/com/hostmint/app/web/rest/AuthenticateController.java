@@ -5,7 +5,9 @@ import static com.hostmint.app.security.SecurityUtils.JWT_ALGORITHM;
 import static com.hostmint.app.security.SecurityUtils.USER_ID_CLAIM;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hostmint.app.aop.audit.Auditable;
 import com.hostmint.app.security.DomainUserDetailsService.UserWithId;
+import com.hostmint.app.service.InternalAuditLogger;
 import com.hostmint.app.web.rest.vm.LoginVM;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -40,6 +42,8 @@ public class AuthenticateController {
 
     private final JwtEncoder jwtEncoder;
 
+    private final InternalAuditLogger auditLogger;
+
     @Value("${jhipster.security.authentication.jwt.token-validity-in-seconds:0}")
     private long tokenValidityInSeconds;
 
@@ -48,8 +52,13 @@ public class AuthenticateController {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public AuthenticateController(JwtEncoder jwtEncoder, AuthenticationManagerBuilder authenticationManagerBuilder) {
+    public AuthenticateController(
+        JwtEncoder jwtEncoder,
+        InternalAuditLogger auditLogger,
+        AuthenticationManagerBuilder authenticationManagerBuilder
+    ) {
         this.jwtEncoder = jwtEncoder;
+        this.auditLogger = auditLogger;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
@@ -62,6 +71,9 @@ public class AuthenticateController {
         String jwt = this.createToken(authentication, loginVM.isRememberMe());
         var httpHeaders = new HttpHeaders();
         httpHeaders.setBearerAuth(jwt);
+
+        auditLogger.action("USER_LOGGED_IN").info(authentication.getName());
+
         return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
