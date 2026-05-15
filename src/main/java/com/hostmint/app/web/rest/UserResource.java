@@ -7,6 +7,7 @@ import com.hostmint.app.security.AuthoritiesConstants;
 import com.hostmint.app.service.MailService;
 import com.hostmint.app.service.UserService;
 import com.hostmint.app.service.dto.AdminUserDTO;
+import com.hostmint.app.service.dto.PasswordChangeDTO;
 import com.hostmint.app.web.rest.errors.BadRequestAlertException;
 import com.hostmint.app.web.rest.errors.EmailAlreadyUsedException;
 import com.hostmint.app.web.rest.errors.LoginAlreadyUsedException;
@@ -25,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -86,10 +88,13 @@ public class UserResource {
 
     private final MailService mailService;
 
-    public UserResource(UserService userService, UserRepository userRepository, MailService mailService) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserResource(UserService userService, UserRepository userRepository, MailService mailService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -204,5 +209,27 @@ public class UserResource {
         LOG.debug("REST request to delete User: {}", login);
         userService.deleteUser(login);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build();
+    }
+
+    /**
+     * {@code POST /api/admin/users/{login}/password} : Force override a user's password.
+     */
+    @PostMapping("/users/{login}/password")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public void adminOverridePassword(
+        @PathVariable @Pattern(regexp = Constants.LOGIN_REGEX) String login,
+        @RequestBody java.util.Map<String, String> payload
+    ) {
+        String newPassword = payload.get("newPassword");
+        if (newPassword == null || newPassword.length() < 4) {
+            throw new BadRequestAlertException("Invalid password", "userManagement", "passwordTooShort");
+        }
+
+        userService
+            .getUserWithAuthoritiesByLogin(login)
+            .ifPresent(user -> {
+                String encryptedPassword = passwordEncoder.encode(newPassword);
+                user.setPassword(encryptedPassword);
+            });
     }
 }

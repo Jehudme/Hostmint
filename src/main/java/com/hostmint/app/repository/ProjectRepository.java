@@ -30,6 +30,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
     }
 
     @Query(
+        value = "select project from Project project left join fetch project.owner where project.owner.login = ?#{principal.username}",
+        countQuery = "select count(project) from Project project where project.owner.login = ?#{principal.username}"
+    )
+    Page<Project> findByOwnerIsCurrentUser(Pageable pageable);
+
+    @Query(
         value = "select project from Project project left join fetch project.owner",
         countQuery = "select count(project) from Project project"
     )

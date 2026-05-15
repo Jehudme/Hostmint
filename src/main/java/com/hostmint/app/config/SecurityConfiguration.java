@@ -38,27 +38,45 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authz ->
-                // prettier-ignore
                 authz
-                    .requestMatchers(HttpMethod.POST, "/api/authenticate").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/authenticate").permitAll()
-                    .requestMatchers("/api/register").permitAll()
-                    .requestMatchers("/api/activate").permitAll()
-                    .requestMatchers("/api/account/reset-password/init").permitAll()
-                    .requestMatchers("/api/account/reset-password/finish").permitAll()
-                    .requestMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    .requestMatchers("/api/**").authenticated()
-                    .requestMatchers("/v3/api-docs/**").hasAuthority(AuthoritiesConstants.ADMIN)
-                    .requestMatchers("/management/health").permitAll()
-                    .requestMatchers("/management/health/**").permitAll()
-                    .requestMatchers("/management/info").permitAll()
-                    .requestMatchers("/management/prometheus").permitAll()
-                    .requestMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers(HttpMethod.POST, "/api/authenticate")
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/authenticate")
+                    .permitAll()
+                    .requestMatchers("/api/register")
+                    .permitAll()
+                    .requestMatchers("/api/activate")
+                    .permitAll()
+                    .requestMatchers("/api/account/reset-password/init")
+                    .permitAll()
+                    .requestMatchers("/api/account/reset-password/finish")
+                    .permitAll()
+                    // --- ADMIN SPECIFIC RULES MUST GO FIRST ---
+                    .requestMatchers("/api/admin/**")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/api/audit-logs/**")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    // --- GENERAL AUTHENTICATED RULES MUST GO LAST ---
+                    .requestMatchers("/api/**")
+                    .authenticated()
+                    // Management endpoints
+                    .requestMatchers("/v3/api-docs/**")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/management/health")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/management/health/**")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/management/info")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/management/prometheus")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
+                    .requestMatchers("/management/**")
+                    .hasAuthority(AuthoritiesConstants.ADMIN)
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exceptions ->
@@ -67,9 +85,11 @@ public class SecurityConfiguration {
                     .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
             )
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+
         if (env.acceptsProfiles(Profiles.of(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT))) {
             http.authorizeHttpRequests(authz -> authz.requestMatchers("/h2-console/**").permitAll());
         }
+
         return http.build();
     }
 }
