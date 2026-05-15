@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 /**
  * A Project.
@@ -14,6 +15,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "project")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@EntityListeners(AuditingEntityListener.class)
 @org.springframework.data.elasticsearch.annotations.Document(indexName = "project")
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Project implements Serializable {
@@ -67,7 +69,8 @@ public class Project implements Serializable {
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
     private Boolean deleted;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false) // <--- Ensure it can't be updated later
+    @org.springframework.data.annotation.CreatedDate // <--- ADD THIS ANNOTATION
     @org.springframework.data.elasticsearch.annotations.Field(
         type = org.springframework.data.elasticsearch.annotations.FieldType.Date,
         format = org.springframework.data.elasticsearch.annotations.DateFormat.date_time
@@ -75,6 +78,7 @@ public class Project implements Serializable {
     private Instant createdAt;
 
     @Column(name = "updated_at")
+    @org.springframework.data.annotation.LastModifiedDate // <--- ADD THIS ANNOTATION
     @org.springframework.data.elasticsearch.annotations.Field(
         type = org.springframework.data.elasticsearch.annotations.FieldType.Date,
         format = org.springframework.data.elasticsearch.annotations.DateFormat.date_time
